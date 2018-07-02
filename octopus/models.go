@@ -1,6 +1,9 @@
 package octopus
 
-import "io"
+import (
+	"io"
+	"time"
+)
 
 // Node is used to represent each crawled link and its associated depth of crawl.
 type Node struct {
@@ -26,11 +29,15 @@ type webOctopus struct {
 // IncludeBody - Include the response Body in the crawled Node (for further processing).
 // OpAdapter is a user specified concrete implementation of an Output Adapter. The crawler
 // will pump output onto the implementation's channel returned by its Consume method.
+// CrawlRate is the rate at which requests will be made.
+// RespectRobots (unimplemented) choose whether to respect robots.txt or not.
 type CrawlOptions struct {
 	DepthPerLink       int16
 	MaxLinksCrawled    int64
 	StayWithinBaseHost bool
 	BaseURLString      string
+	CrawlRate          time.Duration
+	RespectRobots      bool
 	IncludeBody        bool
 	OpAdapter          OutputAdapter
 }
