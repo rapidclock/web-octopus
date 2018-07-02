@@ -10,7 +10,7 @@ const (
 func New(opt CrawlOptions) *webOctopus {
 	oct := &webOctopus{
 		CrawlOptions: opt,
-		visited:      nil,
+		visited:      make(map[Node]bool),
 	}
 	oct.setup()
 	return oct
