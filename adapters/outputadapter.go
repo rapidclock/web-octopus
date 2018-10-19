@@ -1,10 +1,12 @@
-package octopus
+package adapters
 
 import (
 	"fmt"
 	"io"
 	"log"
 	"os"
+
+	oct "github.com/rapidclock/web-octopus/octopus"
 )
 
 // OutputAdapter is the interface for the Adapter that is used to handle
@@ -15,14 +17,14 @@ import (
 // Implementers of the interface should listen on this channel for output from
 // the crawler.
 type OutputAdapter interface {
-	Consume(quitCh <-chan bool) chan<- CrawlOutput
+	Consume(quitCh <-chan bool) chan<- oct.CrawlOutput
 }
 
 // StdOpAdapter is an output adapter that just prints the output onto the screen.
 type StdOpAdapter struct{}
 
-func (s *StdOpAdapter) Consume(quitCh <-chan bool) chan<- CrawlOutput {
-	listenCh := make(chan CrawlOutput)
+func (s *StdOpAdapter) Consume(quitCh <-chan bool) chan<- oct.CrawlOutput {
+	listenCh := make(chan oct.CrawlOutput)
 	go func() {
 		for {
 			select {
@@ -41,13 +43,13 @@ type FileWriterAdapter struct {
 	FilePath string
 }
 
-func (fw *FileWriterAdapter) Consume(quitCh <-chan bool) chan<- CrawlOutput {
-	listenCh := make(chan CrawlOutput)
+func (fw *FileWriterAdapter) Consume(quitCh <-chan bool) chan<- oct.CrawlOutput {
+	listenCh := make(chan oct.CrawlOutput)
 	fw.writeToFile(quitCh, listenCh)
 	return listenCh
 }
 
-func (fw *FileWriterAdapter) writeToFile(quitCh <-chan bool, ch <-chan CrawlOutput) {
+func (fw *FileWriterAdapter) writeToFile(quitCh <-chan bool, ch <-chan oct.CrawlOutput) {
 	fp, err := fw.getFilePointer()
 	if err != nil {
 		fp.Close()
