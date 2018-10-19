@@ -46,3 +46,14 @@ type CrawlOutput struct {
 	Node
 	Body io.ReadCloser
 }
+
+// OutputAdapter is the interface for the Adapter that is used to handle
+// output from the Octopus Crawler.
+// The contract stipulates that the crawler provides the channel
+// to listen for a quit command.
+// The crawler pumps its output onto the returned channel of the Consume method.
+// Implementers of the interface should listen on this channel for output from
+// the crawler.
+type OutputAdapter interface {
+	Consume(quitCh <-chan bool) chan<- CrawlOutput
+}
