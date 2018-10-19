@@ -3,6 +3,8 @@ package octopus
 import (
 	"io"
 	"time"
+
+	"github.com/rapidclock/web-octopus/adapter"
 )
 
 // Node is used to represent each crawled link and its associated depth of crawl.
@@ -39,7 +41,7 @@ type CrawlOptions struct {
 	CrawlRate          time.Duration
 	RespectRobots      bool
 	IncludeBody        bool
-	OpAdapter          OutputAdapter
+	OpAdapter          adapter.OutputAdapter
 }
 
 type CrawlOutput struct {
