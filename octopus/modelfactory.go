@@ -6,8 +6,8 @@ const (
 	anchorAttrb           = "href"
 )
 
-// New - Creates an Instance of the Octopus Crawler with the given options.
-func New(opt CrawlOptions) *webOctopus {
+// MakeNew - Creates an Instance of the Octopus Crawler with the given options.
+func MakeNew(opt CrawlOptions) *webOctopus {
 	oct := &webOctopus{
 		CrawlOptions: opt,
 		visited:      make(map[Node]bool),
