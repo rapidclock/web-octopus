@@ -3,14 +3,23 @@ package main
 import (
 	"fmt"
 	exp "github.com/rapidclock/web-octopus/experimental"
+	"log"
+	"net/http"
 	"time"
 )
 
 const (
-	HomeUrl = "https://en.wikipedia.org/wiki/Main_Page"
+	HomeUrl     = "https://en.wikipedia.org/wiki/Main_Page"
+	LessLinkUrl = "https://vorozhko.net/get-all-links-from-html-page-with-go-lang"
+	Url1        = "https://benjamincongdon.me/blog/2018/03/01/Scraping-the-Web-in-Golang-with-Colly-and-Goquery"
+	Url2        = "https://www.devdungeon.com/content/web-scraping-go"
 )
 
 func main() {
+	checkParsing()
+}
+
+func checkPipelineA() {
 	exp.Temp()
 	crawler := exp.NewEngine()
 	crawler.Consume(HomeUrl)
@@ -26,4 +35,23 @@ func main() {
 	crawler.Consume("Hello Poppet!!")
 	fmt.Printf("4. %v\n", crawler.IsRunning())
 	crawler.TurnOff()
+}
+
+func checkParsing() {
+	resp, err := http.Get(HomeUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	results := exp.GetLinks(resp.Body)
+	fmt.Println(len(results))
+	results = exp.ProcessLinks(HomeUrl, results)
+	fmt.Println(len(results))
+	results = exp.RemoveDuplicates(results)
+	fmt.Println(len(results))
+	results = exp.ValidateLinks(results)
+	fmt.Println(len(results))
+	for _, v := range results {
+		fmt.Println(v)
+	}
 }
