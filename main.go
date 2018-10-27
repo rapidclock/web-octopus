@@ -55,3 +55,7 @@ func checkParsing() {
 		fmt.Println(v)
 	}
 }
+
+func runPipeline() {
+
+}
