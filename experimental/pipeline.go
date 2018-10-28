@@ -93,5 +93,8 @@ func LinkValidationPipeline() chan<- string {
 }
 
 func StructurizePipeline() {
+	go func() {
 
+
+	}()
 }
