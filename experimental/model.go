@@ -11,3 +11,8 @@ type ReqProp struct {
 	ParentUrl string
 	UrlStr    string
 }
+
+type Monster struct {
+	listenPipe chan string
+	compPipe   chan<- *ReqProp
+}

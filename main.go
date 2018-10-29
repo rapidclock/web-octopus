@@ -16,7 +16,6 @@ const (
 )
 
 func main() {
-	//checkParsing()
 	runPipeline()
 }
 
@@ -58,6 +57,8 @@ func checkParsing() {
 }
 
 func runPipeline() {
-	crawlPipe := exp.BuildSystem()
-	crawlPipe <- HomeUrl
+	crawler := exp.NewMonster()
+	opAdapterPipe := exp.GetOutputAdapterPipe()
+	crawler.BuildSystem(opAdapterPipe)
+	crawler.StartCrawling(HomeUrl)
 }
