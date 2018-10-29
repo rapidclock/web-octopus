@@ -1,3 +1,3 @@
 package octopus
 
-func (o *webOctopus) setup() {}
+func (o *octopus) setup() {}

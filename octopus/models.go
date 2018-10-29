@@ -7,15 +7,16 @@ import (
 
 // Node is used to represent each crawled link and its associated depth of crawl.
 type Node struct {
-	URLString string
-	Depth     int
+	ParentUrlString string
+	UrlString       string
+	Depth           int
 }
 
-// webOctopus is a concurrent version of webSpider.
+// octopus is a concurrent version of webSpider.
 // It has an inbuilt parser based of htmlparser.Parser to collect all links in a web-page.
 // It also has a CrawlOptions structure to initialize setting specific
 // to an instance of the crawler.
-type webOctopus struct {
+type octopus struct {
 	CrawlOptions
 	visited map[Node]bool
 }

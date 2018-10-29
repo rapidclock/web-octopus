@@ -7,8 +7,8 @@ const (
 )
 
 // MakeNew - Creates an Instance of the Octopus Crawler with the given options.
-func MakeNew(opt CrawlOptions) *webOctopus {
-	oct := &webOctopus{
+func MakeNew(opt CrawlOptions) *octopus {
+	oct := &octopus{
 		CrawlOptions: opt,
 		visited:      make(map[Node]bool),
 	}
