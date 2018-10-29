@@ -16,6 +16,7 @@ const (
 )
 
 func main() {
+	//exp.Test_makeLinksAbsolute()
 	runPipeline()
 }
 
@@ -60,5 +61,5 @@ func runPipeline() {
 	crawler := exp.NewMonster()
 	opAdapterPipe := exp.GetOutputAdapterPipe()
 	crawler.BuildSystem(opAdapterPipe)
-	crawler.StartCrawling(HomeUrl)
+	crawler.StartCrawling(LessLinkUrl)
 }

@@ -1,0 +1,15 @@
+
+Pipeline
+
+url => structure => remove duplicates => validate urls => make request => parse page for urls ||
+			^														   => output adapter	  ||
+			^===================================================================================
+
+
+1. Composition
+2. Absolutify Links
+3. Un-duplication
+4. Validation
+5. Request
+	a. Page Parsing
+	b. output adapter

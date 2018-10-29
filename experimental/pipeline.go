@@ -18,7 +18,8 @@ func (m *Monster) BuildSystem(opAdapterPipe chan<- *Node) {
 	}
 	validationPipe := MakeUrlValidationPipe(reqPipe)
 	unduplPipe := MakeUnduplicationPipe(validationPipe)
-	compPipe := MakeCompositionPipe(unduplPipe)
+	cleanPipe := MakeLinkCleaningPipe(unduplPipe)
+	compPipe := MakeCompositionPipe(cleanPipe)
 	compPipeChan <- compPipe
 	m.compPipe = compPipe
 }
