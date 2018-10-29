@@ -2,11 +2,9 @@ package experimental
 
 import "io"
 
-type ReqBody io.ReadCloser
-
 type Node struct {
 	*ReqProp
-	Body *ReqBody
+	Body io.ReadCloser
 }
 
 type ReqProp struct {

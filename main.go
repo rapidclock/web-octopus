@@ -16,7 +16,8 @@ const (
 )
 
 func main() {
-	checkParsing()
+	//checkParsing()
+	runPipeline()
 }
 
 func checkPipelineA() {
@@ -57,5 +58,6 @@ func checkParsing() {
 }
 
 func runPipeline() {
-
+	crawlPipe := exp.BuildSystem()
+	crawlPipe <- HomeUrl
 }
