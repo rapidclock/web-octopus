@@ -24,6 +24,9 @@ func (m *Monster) BuildSystem(opAdapterPipe chan<- *Node) {
 }
 
 func (m *Monster) StartCrawling(baseUrlString string) {
+	go func() {
+		m.listenPipe <- baseUrlString
+	}()
 	for {
 		select {
 		case urlStr := <-m.listenPipe:
