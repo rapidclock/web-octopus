@@ -13,7 +13,12 @@ type ReqProp struct {
 	Depth     int
 }
 
+type Options struct {
+	MaxDepth int
+}
+
 type Monster struct {
+	*Options
 	listenPipe chan string
 	compPipe   chan<- *ReqProp
 }

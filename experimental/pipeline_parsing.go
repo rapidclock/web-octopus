@@ -2,7 +2,7 @@ package experimental
 
 import "golang.org/x/net/html"
 
-func MakeParsingPipe() (chan<- *Node, chan<- chan<- *ReqProp) {
+func (m *Monster) MakeParsingPipe() (chan<- *Node, chan<- chan<- *ReqProp) {
 	parsePipe := make(chan *Node)
 	compPipeChan := make(chan chan<- *ReqProp)
 	go func() {

@@ -5,7 +5,7 @@ import (
 	"net/url"
 )
 
-func MakeLinkCleaningPipe(undupPipe chan<- *Node) chan<- *Node {
+func (m *Monster) MakeLinkCleaningPipe(undupPipe chan<- *Node) chan<- *Node {
 	cleanPipe := make(chan *Node)
 	go func() {
 		for {

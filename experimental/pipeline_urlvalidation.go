@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func MakeUrlValidationPipe(requisitionPipe chan<- *Node) chan<- *Node {
+func (m *Monster) MakeUrlValidationPipe(requisitionPipe chan<- *Node) chan<- *Node {
 	validationPipe := make(chan *Node)
 	go func() {
 		for {

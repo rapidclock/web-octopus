@@ -2,7 +2,7 @@ package experimental
 
 import "sync"
 
-func MakeUnduplicationPipe(validationPipe chan<- *Node) chan<- *Node {
+func (m *Monster) MakeUnduplicationPipe(validationPipe chan<- *Node) chan<- *Node {
 	var visitMap sync.Map
 	undupPipe := make(chan *Node)
 	go func() {

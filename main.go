@@ -17,7 +17,8 @@ const (
 
 func main() {
 	//exp.Test_makeLinksAbsolute()
-	runPipeline()
+	//runPipeline()
+	runPipelineWithOptions()
 }
 
 func checkPipelineA() {
@@ -59,6 +60,16 @@ func checkParsing() {
 
 func runPipeline() {
 	crawler := exp.NewMonster()
+	opAdapterPipe := exp.GetOutputAdapterPipe()
+	crawler.BuildSystem(opAdapterPipe)
+	crawler.StartCrawling(LessLinkUrl)
+}
+
+func runPipelineWithOptions() {
+	opt := &exp.Options{
+		MaxDepth: 3,
+	}
+	crawler := exp.NewMonsterWithOptions(opt)
 	opAdapterPipe := exp.GetOutputAdapterPipe()
 	crawler.BuildSystem(opAdapterPipe)
 	crawler.StartCrawling(LessLinkUrl)

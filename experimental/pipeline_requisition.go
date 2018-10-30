@@ -2,7 +2,7 @@ package experimental
 
 import "net/http"
 
-func MakeRequisitionPipe(parsePipe chan<- *Node, opAdapterPipe chan<- *Node) chan<- *Node {
+func (m *Monster) MakeRequisitionPipe(parsePipe chan<- *Node, opAdapterPipe chan<- *Node) chan<- *Node {
 	requisitionPipe := make(chan *Node)
 	go func() {
 		for {

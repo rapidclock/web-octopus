@@ -13,6 +13,6 @@ func HandleOutput(opAdapterPipe <-chan *Node) {
 	for {
 		opNode := <-opAdapterPipe
 		count++
-		fmt.Printf("%d - %v\n", count, opNode.UrlStr)
+		fmt.Printf("%d - %d - %v\n", count, opNode.Depth, opNode.UrlStr)
 	}
 }

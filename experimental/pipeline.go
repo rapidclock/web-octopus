@@ -1,25 +1,43 @@
 package experimental
 
+func NewMonsterWithOptions(options *Options) *Monster {
+	listenChan := make(chan string)
+	var opt *Options
+	if options != nil {
+		opt = options
+	} else {
+		opt = &Options{
+			-1,
+		}
+	}
+	return &Monster{
+		Options:    opt,
+		listenPipe: listenChan,
+		compPipe:   nil,
+	}
+}
+
 func NewMonster() *Monster {
 	listenChan := make(chan string)
 	return &Monster{
-		listenChan,
-		nil,
+		Options:    nil,
+		listenPipe: listenChan,
+		compPipe:   nil,
 	}
 }
 
 func (m *Monster) BuildSystem(opAdapterPipe chan<- *Node) {
-	parsePipe, compPipeChan := MakeParsingPipe()
+	parsePipe, compPipeChan := m.MakeParsingPipe()
 	var reqPipe chan<- *Node
 	if opAdapterPipe == nil {
-		reqPipe = MakeRequisitionPipe(parsePipe, nil)
+		reqPipe = m.MakeRequisitionPipe(parsePipe, nil)
 	} else {
-		reqPipe = MakeRequisitionPipe(parsePipe, opAdapterPipe)
+		reqPipe = m.MakeRequisitionPipe(parsePipe, opAdapterPipe)
 	}
-	validationPipe := MakeUrlValidationPipe(reqPipe)
-	unduplPipe := MakeUnduplicationPipe(validationPipe)
-	cleanPipe := MakeLinkCleaningPipe(unduplPipe)
-	compPipe := MakeCompositionPipe(cleanPipe)
+	validationPipe := m.MakeUrlValidationPipe(reqPipe)
+	unduplPipe := m.MakeUnduplicationPipe(validationPipe)
+	cleanPipe := m.MakeLinkCleaningPipe(unduplPipe)
+	compPipe := m.MakeCompositionPipe(cleanPipe)
 	compPipeChan <- compPipe
 	m.compPipe = compPipe
 }
