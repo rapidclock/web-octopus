@@ -3,9 +3,9 @@ package experimental
 func (m *Monster) MakeCompositionPipe(cleanPipe chan<- *Node) chan<- *ReqProp {
 	compositionPipe := make(chan *ReqProp)
 	structFunc := structurize
-	if m.MaxDepth > 0 {
-		structFunc = structurizeWithDepth
-	}
+	//if m.MaxDepth > 0 {
+	//	structFunc = structurizeWithDepth
+	//}
 	go func() {
 		for {
 			select {

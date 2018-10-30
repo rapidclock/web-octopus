@@ -67,7 +67,7 @@ func runPipeline() {
 
 func runPipelineWithOptions() {
 	opt := &exp.Options{
-		MaxDepth: 3,
+		MaxDepth: 1,
 	}
 	crawler := exp.NewMonsterWithOptions(opt)
 	opAdapterPipe := exp.GetOutputAdapterPipe()

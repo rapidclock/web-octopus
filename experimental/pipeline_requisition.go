@@ -4,16 +4,20 @@ import "net/http"
 
 func (m *Monster) MakeRequisitionPipe(parsePipe chan<- *Node, opAdapterPipe chan<- *Node) chan<- *Node {
 	requisitionPipe := make(chan *Node)
-	go func() {
+	isDepthLimited := false
+	if m.MaxDepth > 0 {
+		isDepthLimited = true
+	}
+	go func(isDepthLimited bool, maxDepth int) {
 		for {
 			select {
 			case node := <-requisitionPipe:
 				{
-					go makeRequest(node, parsePipe, opAdapterPipe)
+					go depthLimitedRequest(isDepthLimited, maxDepth, node, parsePipe, opAdapterPipe)
 				}
 			}
 		}
-	}()
+	}(isDepthLimited, m.MaxDepth)
 	return requisitionPipe
 }
 
@@ -25,5 +29,12 @@ func makeRequest(node *Node, parsePipe chan<- *Node, opAdapterPipe chan<- *Node)
 		if opAdapterPipe != nil {
 			opAdapterPipe <- node
 		}
+	}
+}
+
+func depthLimitedRequest(isDepthLimited bool, maxDepth int,
+	node *Node, parsePipe chan<- *Node, opAdapterPipe chan<- *Node) {
+	if !isDepthLimited || node.Depth <= maxDepth {
+		makeRequest(node, parsePipe, opAdapterPipe)
 	}
 }
