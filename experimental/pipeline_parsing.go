@@ -35,6 +35,7 @@ func parsePage(node *Node, compositionPipe chan<- *ReqProp) {
 						compositionPipe <- &ReqProp{
 							ParentUrl: node.UrlStr,
 							UrlStr:    attr.Val,
+							Depth:     node.Depth + 1,
 						}
 					}
 				}

@@ -41,6 +41,7 @@ func Test_makeLinksAbsolute() {
 		&ReqProp{
 			"https://en.wikipedia.org/wiki/Main_Page",
 			"/wiki/Caijia_language",
+			1,
 		},
 		nil,
 	}

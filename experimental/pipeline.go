@@ -12,9 +12,9 @@ func (m *Monster) BuildSystem(opAdapterPipe chan<- *Node) {
 	parsePipe, compPipeChan := MakeParsingPipe()
 	var reqPipe chan<- *Node
 	if opAdapterPipe == nil {
-		reqPipe = MakeRequistionPipe(parsePipe, nil)
+		reqPipe = MakeRequisitionPipe(parsePipe, nil)
 	} else {
-		reqPipe = MakeRequistionPipe(parsePipe, opAdapterPipe)
+		reqPipe = MakeRequisitionPipe(parsePipe, opAdapterPipe)
 	}
 	validationPipe := MakeUrlValidationPipe(reqPipe)
 	unduplPipe := MakeUnduplicationPipe(validationPipe)
@@ -34,6 +34,7 @@ func (m *Monster) StartCrawling(baseUrlString string) {
 			m.compPipe <- &ReqProp{
 				"",
 				urlStr,
+				0,
 			}
 		}
 	}

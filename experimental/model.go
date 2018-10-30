@@ -10,6 +10,7 @@ type Node struct {
 type ReqProp struct {
 	ParentUrl string
 	UrlStr    string
+	Depth     int
 }
 
 type Monster struct {

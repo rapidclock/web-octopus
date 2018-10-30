@@ -12,8 +12,8 @@ type Node struct {
 	Depth           int
 }
 
-// octopus is a concurrent version of webSpider.
-// It has an inbuilt parser based of htmlparser.Parser to collect all links in a web-page.
+// octopus is a concurrent web crawler.
+// It has an inbuilt parser based of html.NewTokenizer to collect all links in a web-page.
 // It also has a CrawlOptions structure to initialize setting specific
 // to an instance of the crawler.
 type octopus struct {
