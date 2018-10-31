@@ -1,3 +1,22 @@
 package octopus
 
-func (o *octopus) setup() {}
+func (o *octopus) BuildSystem(opAdapter *OutputAdapter) {
+	//parsePipe, compPipeChan := m.MakeParsingPipe()
+	//var reqPipe chan<- *Node
+	//if opAdapterPipe == nil {
+	//	reqPipe = m.MakeRequisitionPipe(parsePipe, nil)
+	//} else {
+	//	reqPipe = m.MakeRequisitionPipe(parsePipe, opAdapterPipe)
+	//}
+	//validationPipe := m.MakeUrlValidationPipe(reqPipe)
+	//unduplPipe := m.MakeUnduplicationPipe(validationPipe)
+	//cleanPipe := m.MakeLinkCleaningPipe(unduplPipe)
+	//compPipe := m.MakeCompositionPipe(cleanPipe)
+	//compPipeChan <- compPipe
+	//m.compPipe = compPipe
+
+}
+
+func (o *octopus) BeginCrawling() {
+
+}

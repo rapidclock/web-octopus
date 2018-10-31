@@ -2,7 +2,7 @@ package octopus
 
 import (
 	"io"
-	"time"
+	"sync"
 )
 
 // Node is used to represent each crawled link and its associated depth of crawl.
@@ -17,8 +17,9 @@ type Node struct {
 // It also has a CrawlOptions structure to initialize setting specific
 // to an instance of the crawler.
 type octopus struct {
-	CrawlOptions
-	visited map[Node]bool
+	*CrawlOptions
+	visited *sync.Map
+	isBuilt bool
 }
 
 // CrawlOptions is used to house options for crawling.
@@ -33,18 +34,17 @@ type octopus struct {
 // CrawlRate is the rate at which requests will be made.
 // RespectRobots (unimplemented) choose whether to respect robots.txt or not.
 type CrawlOptions struct {
-	DepthPerLink       int16
+	MaxDepthCrawled    int64
 	MaxLinksCrawled    int64
 	StayWithinBaseHost bool
-	BaseURLString      string
-	CrawlRate          time.Duration
+	CrawlRatePerSec    int64
 	RespectRobots      bool
 	IncludeBody        bool
-	OpAdapter          OutputAdapter
+	OpAdapter          *OutputAdapter
 }
 
 type CrawlOutput struct {
-	Node
+	*Node
 	Body io.ReadCloser
 }
 
@@ -56,5 +56,5 @@ type CrawlOutput struct {
 // Implementers of the interface should listen on this channel for output from
 // the crawler.
 type OutputAdapter interface {
-	Consume(quitCh <-chan bool) chan<- CrawlOutput
+	Consume(quitCh <-chan bool) chan<- *CrawlOutput
 }

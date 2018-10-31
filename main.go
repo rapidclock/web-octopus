@@ -72,5 +72,5 @@ func runPipelineWithOptions() {
 	crawler := exp.NewMonsterWithOptions(opt)
 	opAdapterPipe := exp.GetOutputAdapterPipe()
 	crawler.BuildSystem(opAdapterPipe)
-	crawler.StartCrawling(LessLinkUrl)
+	crawler.StartCrawling(HomeUrl)
 }
