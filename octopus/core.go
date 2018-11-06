@@ -6,6 +6,7 @@ import (
 )
 
 func (o *octopus) setupValidProtocolMap() {
+	o.isValidProtocol = make(map[string]bool)
 	for _, protocol := range o.ValidProtocols {
 		o.isValidProtocol[protocol] = true
 	}

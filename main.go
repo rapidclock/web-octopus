@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
-	exp "github.com/rapidclock/web-octopus/experimental"
 	"log"
 	"net/http"
 	"time"
+
+	adapter2 "github.com/rapidclock/web-octopus/adapter"
+	exp "github.com/rapidclock/web-octopus/experimental"
+	oct "github.com/rapidclock/web-octopus/octopus"
 )
 
 const (
@@ -16,9 +19,21 @@ const (
 )
 
 func main() {
-	//exp.Test_makeLinksAbsolute()
-	//runPipeline()
-	runPipelineWithOptions()
+	// exp.Test_makeLinksAbsolute()
+	// runPipeline()
+	// runPipelineWithOptions()
+	octopusTest()
+}
+
+func octopusTest() {
+	adapter := &adapter2.StdOpAdapter{}
+
+	crawlOpt := oct.GetDefaultCrawlOptions()
+	crawlOpt.OpAdapter = adapter
+
+	octopus := oct.New(crawlOpt)
+	octopus.SetupSystem()
+	octopus.BeginCrawling(Url2)
 }
 
 func checkPipelineA() {
