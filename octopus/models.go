@@ -64,12 +64,7 @@ type NodeChSet struct {
 }
 
 type StringChSet struct {
-	strCh chan<- string
-	*StdChannels
-}
-
-type NodeInfoChSet struct {
-	nodeInfoCh chan<- *NodeInfo
+	StrCh chan<- string
 	*StdChannels
 }
 
