@@ -11,9 +11,12 @@ import (
 // to an instance of the crawler.
 type octopus struct {
 	*CrawlOptions
-	visited      *sync.Map
-	isReady      bool
-	adapterChSet *NodeChSet
+	visited         *sync.Map
+	isReady         bool
+	adapterChSet    *NodeChSet
+	isValidProtocol map[string]bool
+	inpUrlStrChan   chan string
+	masterQuitCh    chan int
 }
 
 // CrawlOptions is used to house options for crawling.
@@ -36,7 +39,8 @@ type CrawlOptions struct {
 	CrawlRatePerSec    int64
 	RespectRobots      bool
 	IncludeBody        bool
-	OpAdapter          *OutputAdapter
+	OpAdapter          OutputAdapter
+	ValidProtocols     []string
 }
 
 // NodeInfo is used to represent each crawled link and its associated crawl depth.
@@ -63,9 +67,10 @@ type NodeChSet struct {
 	*StdChannels
 }
 
-type StringChSet struct {
-	StrCh chan<- string
-	*StdChannels
+type ingestPipeChSet struct {
+	NodeCh chan *Node
+	StrCh  chan string
+	QuitCh chan int
 }
 
 // OutputAdapter is the interface for the Adapter that is used to handle

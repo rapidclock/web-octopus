@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (o *octopus) makeFilterUrlValidationPipe(outChSet *NodeChSet) *NodeChSet {
+func (o *octopus) makeInvalidUrlFilterPipe(outChSet *NodeChSet) *NodeChSet {
 	return stdLinearNodeFunc(validateUrl, outChSet)
 }
 

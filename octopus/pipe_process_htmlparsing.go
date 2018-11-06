@@ -18,9 +18,9 @@ func parseHtmlPage(node *Node, outChSet *NodeChSet) {
 			return
 		case html.StartTagToken, html.EndTagToken:
 			token := z.Token()
-			if "a" == token.Data {
+			if anchorTag == token.Data {
 				for _, attr := range token.Attr {
-					if attr.Key == "href" {
+					if attr.Key == anchorAttrb {
 						outChSet.NodeCh <- &Node{
 							NodeInfo: &NodeInfo{
 								ParentUrlString: node.UrlString,

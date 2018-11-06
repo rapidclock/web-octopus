@@ -1,6 +1,6 @@
 package octopus
 
-func (o *octopus) makeFilterCrawlDepthPipe(outChSet *NodeChSet) *NodeChSet {
+func (o *octopus) makeCrawlDepthFilterPipe(outChSet *NodeChSet) *NodeChSet {
 	return stdLinearNodeFunc(o.filterByUrlDepth, outChSet)
 }
 

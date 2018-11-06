@@ -1,6 +1,6 @@
 package octopus
 
-func (o *octopus) makeFilterUnduplicationPipe(outChSet *NodeChSet) *NodeChSet {
+func (o *octopus) makeDuplicateUrlFilterPipe(outChSet *NodeChSet) *NodeChSet {
 	return stdLinearNodeFunc(o.filterDuplicates, outChSet)
 }
 
