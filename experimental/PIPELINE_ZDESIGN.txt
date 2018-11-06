@@ -1,9 +1,11 @@
 
 Pipeline
 
-url => structure => absolutify links => remove duplicates => validate urls => make request => parse page for urls ||
-			^											                    			   => output adapter      ||
-			^=====================================================================================================
+url => ingest
+          v                                                                                 |=> output adapter
+      structure => absolutify links => remove duplicates => validate urls =>  make request  |=> parse page for urls ||
+			^========================================================================================================
+
 
 
 1. Composition

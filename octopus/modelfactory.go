@@ -11,11 +11,10 @@ const (
 // NewWithDefaultOptions - Create an Instance of the Octopus with the default CrawlOptions.
 func NewWithDefaultOptions() *octopus {
 	oct := &octopus{
-		CrawlOptions: getDefaultCrawlOptions(),
+		CrawlOptions: GetDefaultCrawlOptions(),
 		visited:      new(sync.Map),
-		isBuilt:      false,
+		isReady:      false,
 	}
-	oct.setup()
 	return oct
 }
 
@@ -24,15 +23,15 @@ func New(opt *CrawlOptions) *octopus {
 	oct := &octopus{
 		CrawlOptions: opt,
 		visited:      new(sync.Map),
-		isBuilt:      false,
+		isReady:      false,
 	}
 	return oct
 }
 
-func getDefaultCrawlOptions() *CrawlOptions {
+func GetDefaultCrawlOptions() *CrawlOptions {
 	return &CrawlOptions{
-		MaxDepthCrawled:    -1,
-		MaxLinksCrawled:    -1,
+		MaxCrawlDepth:      -1,
+		MaxCrawlLinks:      -1,
 		StayWithinBaseHost: false,
 		CrawlRatePerSec:    -1,
 		RespectRobots:      false,

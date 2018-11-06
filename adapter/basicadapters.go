@@ -12,19 +12,26 @@ import (
 // StdOpAdapter is an output adapter that just prints the output onto the screen.
 type StdOpAdapter struct{}
 
-func (s *StdOpAdapter) Consume(quitCh <-chan bool) chan<- oct.CrawlOutput {
-	listenCh := make(chan oct.CrawlOutput)
+func (s *StdOpAdapter) Consume() *oct.NodeChSet {
+	listenCh := make(chan *oct.Node)
+	quitCh := make(chan int, 1)
+	listenChSet := &oct.NodeChSet{
+		NodeCh: listenCh,
+		StdChannels: &oct.StdChannels{
+			QuitCh: quitCh,
+		},
+	}
 	go func() {
 		for {
 			select {
 			case output := <-listenCh:
-				fmt.Printf("%d - %s\n", output.Depth, output.URLString)
+				fmt.Printf("%d - %s\n", output.Depth, output.UrlString)
 			case <-quitCh:
 				return
 			}
 		}
 	}()
-	return listenCh
+	return listenChSet
 }
 
 // FileWriterAdapter is an output adapter that writes the output to a specified file.
@@ -32,13 +39,21 @@ type FileWriterAdapter struct {
 	FilePath string
 }
 
-func (fw *FileWriterAdapter) Consume(quitCh <-chan bool) chan<- oct.CrawlOutput {
-	listenCh := make(chan oct.CrawlOutput)
-	fw.writeToFile(quitCh, listenCh)
-	return listenCh
+func (fw *FileWriterAdapter) Consume() *oct.NodeChSet {
+	listenCh := make(chan *oct.Node)
+	quitCh := make(chan int, 1)
+	listenChSet := &oct.NodeChSet{
+		NodeCh: listenCh,
+		StdChannels: &oct.StdChannels{
+			QuitCh: quitCh,
+		},
+	}
+	fw.writeToFile(listenCh, quitCh)
+	return listenChSet
 }
 
-func (fw *FileWriterAdapter) writeToFile(quitCh <-chan bool, ch <-chan oct.CrawlOutput) {
+func (fw *FileWriterAdapter) writeToFile(listenCh chan *oct.Node,
+	quitCh chan int) {
 	fp, err := fw.getFilePointer()
 	if err != nil {
 		fp.Close()
@@ -48,8 +63,8 @@ func (fw *FileWriterAdapter) writeToFile(quitCh <-chan bool, ch <-chan oct.Crawl
 		defer fp.Close()
 		for {
 			select {
-			case output := <-ch:
-				fmt.Fprintf(fp, "%d - %s\n", output.Depth, output.URLString)
+			case output := <-listenCh:
+				fmt.Fprintf(fp, "%d - %s\n", output.Depth, output.UrlString)
 			case <-quitCh:
 				return
 			}
