@@ -73,6 +73,6 @@ func (fw *FileWriterAdapter) writeToFile(listenCh chan *oct.Node,
 }
 
 func (fw *FileWriterAdapter) getFilePointer() (w io.WriteCloser, err error) {
-	w, err = os.OpenFile(fw.FilePath, os.O_RDWR|os.O_CREATE, 0755)
+	w, err = os.OpenFile(fw.FilePath, os.O_RDWR|os.O_CREATE, 0644)
 	return
 }

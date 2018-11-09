@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	adapter2 "github.com/rapidclock/web-octopus/adapter"
+	"github.com/rapidclock/web-octopus/adapter"
 	exp "github.com/rapidclock/web-octopus/experimental"
 	oct "github.com/rapidclock/web-octopus/octopus"
 )
@@ -22,18 +22,40 @@ func main() {
 	// exp.Test_makeLinksAbsolute()
 	// runPipeline()
 	// runPipelineWithOptions()
-	octopusTest()
+	// octopusTest()
+	stupid()
 }
 
+func stupid() {
+	// resp, err := http.Head(HomeUrl)
+	// if err == nil && resp == nil {
+	// 	log.Fatal("WOW resp is nill although err is not")
+	// }
+	// if err == nil && resp != nil && resp.StatusCode == 200 {
+	// 	fmt.Printf("%s\n", resp.Status)
+	// }
+	resp, err := http.Head("https://en.wikipedia.org/wiki/Main_Page")
+	fmt.Println("A")
+	if err == nil && resp == nil {
+		log.Fatal("WOW resp is nill although err is not")
+	}
+	fmt.Println("B")
+	if err == nil && resp.StatusCode == 200 {
+		fmt.Printf("\nXX%s\n", resp.Status)
+	}
+	fmt.Println("C")
+}
 func octopusTest() {
-	adapter := &adapter2.StdOpAdapter{}
+	outputAdapter := &adapter.StdOpAdapter{}
+	// outputAdapter := &adapter.FileWriterAdapter{"crawl_output.txt"}
 
 	crawlOpt := oct.GetDefaultCrawlOptions()
-	crawlOpt.OpAdapter = adapter
+	crawlOpt.MaxCrawlDepth = 3
+	crawlOpt.OpAdapter = outputAdapter
 
 	octopus := oct.New(crawlOpt)
 	octopus.SetupSystem()
-	octopus.BeginCrawling(Url2)
+	octopus.BeginCrawling(Url1)
 }
 
 func checkPipelineA() {

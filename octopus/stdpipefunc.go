@@ -15,9 +15,10 @@ func stdLinearNodeFunc(stdFn stdFunc, outChSet *NodeChSet) *NodeChSet {
 			QuitCh: listenQuitCh,
 		},
 	}
+	// listenChSet := MakeNodeChSet(listenCh, listenQuitCh)
 	go func() {
-		defer close(listenCh)
-		defer close(listenQuitCh)
+		// defer close(listenCh)
+		// defer close(listenQuitCh)
 		for {
 			select {
 			case node := <-listenCh:

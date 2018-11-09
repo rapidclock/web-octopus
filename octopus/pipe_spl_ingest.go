@@ -1,7 +1,6 @@
 package octopus
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -18,33 +17,45 @@ func setupStringIngestPipe(inChSet *ingestPipeChSet, nodeOpChSet *NodeChSet,
 			{
 				nodeOpChSet.NodeCh <- createNode("", str, 1)
 			}
-		// case i := <-inChSet.QuitCh:
-			// 	{
-			// 		nodeOpChSet.QuitCh <- i
-			// 		masterQuitCh <- i
-			// 	}
+		case i := <-inChSet.QuitCh:
+			{
+				nodeOpChSet.QuitCh <- i
+				masterQuitCh <- i
+			}
 		}
 	}
 }
 
 func channelConnector(inChSet *ingestPipeChSet, opChSet *NodeChSet,
 	timeOut time.Duration, masterQuitCh chan int) {
+	// timeOutTimer := time.NewTimer(timeOut)
 	for {
+		// timeOutCh = time.After(timeOut * time.Second)
+		// timeOutCh = time.NewTimer(timeOut)
 		select {
 		case node := <-inChSet.NodeCh:
 			opChSet.NodeCh <- node
-		case i := <-inChSet.QuitCh:
-			{
-				fmt.Println("Quit Received on Ingest Channel")
-				opChSet.QuitCh <- i
-				masterQuitCh <- i
-			}
-		case <-time.After(timeOut * time.Second):
-			{
-				fmt.Println("Timeout Triggered in Ingest Channel")
-				opChSet.QuitCh <- 1
-				return
-			}
+			// if !timeOutTimer.Stop() {
+			// 	<-timeOutTimer.C
+			// }
+			// log.Println("abc")
+			// timeOutTimer.Reset(timeOut)
+			// case i := <-inChSet.QuitCh:
+			// 	{
+			// 		fmt.Println("Quit Received on Ingest Channel")
+			// opChSet.QuitCh <- i
+			// 		masterQuitCh <- i
+			// 		if !timeOutTimer.Stop() {
+			// 			<-timeOutTimer.C
+			// 		}
+			// 		timeOutTimer.Reset(timeOut)
+			// 	}
+			// case <-timeOutTimer.C:
+			// 	fmt.Println("Timeout Triggered in Ingest Channel")
+			// 	opChSet.QuitCh <- 1
+			// 	masterQuitCh <- 1
+			// 	return
+
 		}
 	}
 }

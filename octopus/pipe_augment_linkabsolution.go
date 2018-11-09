@@ -1,6 +1,7 @@
 package octopus
 
 import (
+	"log"
 	"net/url"
 )
 
@@ -9,6 +10,10 @@ func (o *octopus) makeLinkAbsolutionPipe(outChSet *NodeChSet) *NodeChSet {
 }
 
 func makeLinkAbsolute(node *Node, outChSet *NodeChSet) {
+	if node == nil || outChSet == nil {
+		log.Fatal("NIL ERROR")
+		return
+	}
 	if node.ParentUrlString != "" {
 		linkUrl, err := url.Parse(node.UrlString)
 		if err != nil {

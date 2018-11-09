@@ -6,7 +6,7 @@ const (
 	defaultMaxDepth   int64 = 2
 	anchorTag               = "a"
 	anchorAttrb             = "href"
-	defaultTimeToQuit       = 5
+	defaultTimeToQuit       = 10
 )
 
 // NewWithDefaultOptions - Create an Instance of the Octopus with the default CrawlOptions.

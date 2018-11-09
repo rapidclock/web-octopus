@@ -17,7 +17,7 @@ type octopus struct {
 	adapterChSet    *NodeChSet
 	isValidProtocol map[string]bool
 	timeToQuit      time.Duration
-	inpUrlStrChan   chan string
+	inputUrlStrChan chan string
 	masterQuitCh    chan int
 }
 
