@@ -1,5 +1,9 @@
 package octopus
 
+import (
+	"fmt"
+)
+
 type stdFunc func(*Node, *NodeChSet)
 
 func stdLinearNodeFunc(stdFn stdFunc, outChSet *NodeChSet) *NodeChSet {
@@ -22,6 +26,7 @@ func stdLinearNodeFunc(stdFn stdFunc, outChSet *NodeChSet) *NodeChSet {
 				}
 			case <-listenQuitCh:
 				{
+					fmt.Println("Quit Received on Internal Channel")
 					outChSet.QuitCh <- 1
 					return
 				}

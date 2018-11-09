@@ -3,9 +3,10 @@ package octopus
 import "sync"
 
 const (
-	defaultMaxDepth int64 = 2
-	anchorTag             = "a"
-	anchorAttrb           = "href"
+	defaultMaxDepth   int64 = 2
+	anchorTag               = "a"
+	anchorAttrb             = "href"
+	defaultTimeToQuit       = 5
 )
 
 // NewWithDefaultOptions - Create an Instance of the Octopus with the default CrawlOptions.
@@ -49,6 +50,7 @@ func GetDefaultCrawlOptions() *CrawlOptions {
 		IncludeBody:        true,
 		OpAdapter:          nil,
 		ValidProtocols:     []string{"http", "https"},
+		TimeToQuit:         defaultTimeToQuit,
 	}
 }
 

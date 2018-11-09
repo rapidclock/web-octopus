@@ -3,6 +3,7 @@ package octopus
 import (
 	"io"
 	"sync"
+	"time"
 )
 
 // octopus is a concurrent web crawler.
@@ -15,6 +16,7 @@ type octopus struct {
 	isReady         bool
 	adapterChSet    *NodeChSet
 	isValidProtocol map[string]bool
+	timeToQuit      time.Duration
 	inpUrlStrChan   chan string
 	masterQuitCh    chan int
 }
@@ -32,6 +34,10 @@ type octopus struct {
 // will pump output onto the implementation's channel returned by its Consume method.
 // CrawlRate is the rate at which requests will be made.
 // RespectRobots (unimplemented) choose whether to respect robots.txt or not.
+// ValidProtocols - This is an array containing the list of url protocols that
+// should be crawled.
+// TimeToQuit - represents the total time to wait between two new nodes to be
+// generated before the crawler quits. This is in seconds.
 type CrawlOptions struct {
 	MaxCrawlDepth      int64
 	MaxCrawlLinks      int64
@@ -41,6 +47,7 @@ type CrawlOptions struct {
 	IncludeBody        bool
 	OpAdapter          OutputAdapter
 	ValidProtocols     []string
+	TimeToQuit         int64
 }
 
 // NodeInfo is used to represent each crawled link and its associated crawl depth.

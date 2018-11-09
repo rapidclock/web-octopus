@@ -1,9 +1,15 @@
 package octopus
 
 import (
+	"fmt"
 	"log"
 	"time"
 )
+
+func (o *octopus) setupOctopus() {
+	o.setupValidProtocolMap()
+	o.setupTimeToQuit()
+}
 
 func (o *octopus) setupValidProtocolMap() {
 	o.isValidProtocol = make(map[string]bool)
@@ -12,8 +18,16 @@ func (o *octopus) setupValidProtocolMap() {
 	}
 }
 
+func (o *octopus) setupTimeToQuit() {
+	if o.TimeToQuit > 0 {
+		o.timeToQuit = time.Duration(o.TimeToQuit)
+	} else {
+		log.Fatalln("TimeToQuit is not greater than 0")
+	}
+}
+
 func (o *octopus) SetupSystem() {
-	o.setupValidProtocolMap()
+	o.setupOctopus()
 
 	ingestCh := make(chan *Node)
 	ingestQuitCh := make(chan int, 1)
@@ -39,7 +53,7 @@ func (o *octopus) SetupSystem() {
 	o.makeIngestPipe(inPipeChSet, linkAbsChSet)
 
 	o.inpUrlStrChan = ingestStrCh
-	o.masterQuitCh = ingestQuitCh
+	o.masterQuitCh = make(chan int, 1)
 	o.isReady = true
 }
 
@@ -56,9 +70,9 @@ func (o *octopus) BeginCrawling(baseUrlStr string) {
 			{
 				o.inpUrlStrChan <- urlStr
 			}
-		case <-time.After(10 * time.Second):
+		case <-o.masterQuitCh:
 			{
-				o.masterQuitCh <- 1
+				fmt.Println("Master Kill Switch Activated")
 				return
 			}
 		}
