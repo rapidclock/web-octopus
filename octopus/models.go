@@ -22,20 +22,28 @@ type octopus struct {
 }
 
 // CrawlOptions is used to house options for crawling.
+//
 // You can specify depth of exploration for each link,
-// if crawler should ignore other hostnames (except from base host).
+// if crawler should ignore other host names (except from base host).
+//
 // MaxCrawlDepth - Indicates the maximum depth that will be crawled,
 // for each new link.
+//
 // MaxCrawlLinks - Specifies the Maximum Number of Unique Links that will be crawled.
 // Note : When combined with DepthPerLink, it will combine both.
 // Use -1 to indicate infinite links to be crawled (only bounded by depth of traversal).
+//
 // IncludeBody - Include the response Body in the crawled NodeInfo (for further processing).
 // OpAdapter is a user specified concrete implementation of an Output Adapter. The crawler
 // will pump output onto the implementation's channel returned by its Consume method.
-// CrawlRate is the rate at which requests will be made.
+//
+// CrawlRate (unimplemented) is the rate at which requests will be made.
+//
 // RespectRobots (unimplemented) choose whether to respect robots.txt or not.
+//
 // ValidProtocols - This is an array containing the list of url protocols that
 // should be crawled.
+//
 // TimeToQuit - represents the total time to wait between two new nodes to be
 // generated before the crawler quits. This is in seconds.
 type CrawlOptions struct {

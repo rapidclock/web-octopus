@@ -7,6 +7,7 @@ const (
 	anchorTag               = "a"
 	anchorAttrb             = "href"
 	defaultTimeToQuit       = 5
+	defaultCrawlLimit int64 = -1
 )
 
 // NewWithDefaultOptions - Create an Instance of the Octopus with the default CrawlOptions.
@@ -43,7 +44,7 @@ func createNode(parentUrlStr, urlStr string, depth int64) *Node {
 func GetDefaultCrawlOptions() *CrawlOptions {
 	return &CrawlOptions{
 		MaxCrawlDepth:      defaultMaxDepth,
-		MaxCrawlLinks:      -1,
+		MaxCrawlLinks:      defaultCrawlLimit,
 		StayWithinBaseHost: false,
 		CrawlRatePerSec:    -1,
 		RespectRobots:      false,
