@@ -26,31 +26,37 @@ type octopus struct {
 // You can specify depth of exploration for each link,
 // if crawler should ignore other host names (except from base host).
 //
-// MaxCrawlDepth - Indicates the maximum depth that will be crawled,
-// for each new link.
+// 	MaxCrawlDepth - Indicates the maximum depth that will be crawled,
+// 	for each new link.
 //
-// MaxCrawlLinks - Specifies the Maximum Number of Unique Links that will be crawled.
-// Note : When combined with DepthPerLink, it will combine both.
-// Use -1 to indicate infinite links to be crawled (only bounded by depth of traversal).
+// 	MaxCrawlLinks - Specifies the Maximum Number of Unique Links that will be crawled.
+// 	Note : When combined with DepthPerLink, it will combine both.
+// 	Use -1 to indicate infinite links to be crawled (only bounded by depth of traversal).
 //
-// IncludeBody - Include the response Body in the crawled NodeInfo (for further processing).
-// OpAdapter is a user specified concrete implementation of an Output Adapter. The crawler
-// will pump output onto the implementation's channel returned by its Consume method.
+// 	StayWithinBaseHost - (unimplemented) Ensures crawler stays within the
+// 	level 1 link's hostname.
 //
-// CrawlRate (unimplemented) is the rate at which requests will be made.
+// 	CrawlRate (unimplemented) is the rate at which requests will be made.
+// 	In seconds
 //
-// RespectRobots (unimplemented) choose whether to respect robots.txt or not.
+// 	RespectRobots (unimplemented) choose whether to respect robots.txt or not.
 //
-// ValidProtocols - This is an array containing the list of url protocols that
-// should be crawled.
+// 	IncludeBody - (unimplemented) Include the response Body in the crawled
+// 	NodeInfo (for further processing).
 //
-// TimeToQuit - represents the total time to wait between two new nodes to be
-// generated before the crawler quits. This is in seconds.
+// 	OpAdapter is a user specified concrete implementation of an Output Adapter. The crawler
+// 	will pump output onto the implementation's channel returned by its Consume method.
+//
+// 	ValidProtocols - This is an array containing the list of url protocols that
+// 	should be crawled.
+//
+// 	TimeToQuit - represents the total time to wait between two new nodes to be
+// 	generated before the crawler quits. This is in seconds.
 type CrawlOptions struct {
 	MaxCrawlDepth      int64
 	MaxCrawlLinks      int64
 	StayWithinBaseHost bool
-	CrawlRatePerSec    int64
+	CrawlRate          int64
 	RespectRobots      bool
 	IncludeBody        bool
 	OpAdapter          OutputAdapter
@@ -71,12 +77,17 @@ type Node struct {
 	Body io.ReadCloser
 }
 
+// StdChannels are used to hold the standard set of channels that are used
+// for special operations. Will include channels for Logging, Statistics,
+// etc. in the future.
 type StdChannels struct {
 	QuitCh chan<- int
 	// logCh     chan<- string
 	// errorCh   chan<- string
 }
 
+// NodeChSet is the standard set of channels used to build the concurrency
+// pipelines in the crawler.
 type NodeChSet struct {
 	NodeCh chan<- *Node
 	*StdChannels
@@ -88,13 +99,19 @@ type ingestPipeChSet struct {
 	QuitCh chan int
 }
 
-// OutputAdapter is the interface for the Adapter that is used to handle
-// output from the Octopus Crawler.
-// The contract stipulates that the crawler provides the channel
-// to listen for a quit command.
-// The crawler pumps its output onto the returned channel of the Consume method.
-// Implementers of the interface should listen on this channel for output from
-// the crawler.
+// OutputAdapter is the interface that has to be implemented in order to
+// handle outputs from the octopus crawler.
+//
+// The octopus will call the OutputAdapter.Consume(
+// ) method and deliver all relevant output and quit signals on the channels
+// included in the received NodeChSet.
+//
+// This implies that it is the responsibility of the user who implements
+// OutputAdapter to handle processing the output of the crawler that is
+// delivered on the NodeChSet.NodeCh.
+//
+// Implementers of the interface should listen to the included channels in
+// the output of Consume() for output from the crawler.
 type OutputAdapter interface {
 	Consume() *NodeChSet
 }
