@@ -9,6 +9,7 @@ import (
 func (o *octopus) setupOctopus() {
 	o.setupValidProtocolMap()
 	o.setupTimeToQuit()
+	o.setupMaxLinksCrawled()
 }
 
 func (o *octopus) setupValidProtocolMap() {
@@ -23,6 +24,12 @@ func (o *octopus) setupTimeToQuit() {
 		o.timeToQuit = time.Duration(o.TimeToQuit) * time.Second
 	} else {
 		log.Fatalln("TimeToQuit is not greater than 0")
+	}
+}
+
+func (o *octopus) setupMaxLinksCrawled() {
+	if o.MaxCrawledUrls == 0 {
+		panic("MaxCrawledUrls should either be negative or greater than 0.")
 	}
 }
 
@@ -49,7 +56,15 @@ func (o *octopus) SetupSystem() {
 	pageParseChSet := o.makeParseNodeFromHtmlPipe(ingestChSet)
 	depthLimitChSet := o.makeCrawlDepthFilterPipe(pageParseChSet)
 	maxDelayChSet := o.makeMaxDelayPipe(depthLimitChSet)
-	distributorChSet := o.makeDistributorPipe(maxDelayChSet, outAdapterChSet)
+
+	var distributorChSet *NodeChSet
+	if o.MaxCrawledUrls < 0 {
+		distributorChSet = o.makeDistributorPipe(maxDelayChSet, outAdapterChSet)
+	} else {
+		maxLinksCrawledChSet := o.makeLimitCrawlPipe(outAdapterChSet)
+		distributorChSet = o.makeDistributorPipe(maxDelayChSet, maxLinksCrawledChSet)
+	}
+
 	pageReqChSet := o.makePageRequisitionPipe(distributorChSet)
 	invUrlFilterChSet := o.makeInvalidUrlFilterPipe(pageReqChSet)
 	dupFilterChSet := o.makeDuplicateUrlFilterPipe(invUrlFilterChSet)
@@ -64,7 +79,7 @@ func (o *octopus) SetupSystem() {
 
 func (o *octopus) BeginCrawling(baseUrlStr string) {
 	if !o.isReady {
-		log.Fatal("Call BuildSystem first to setup Octopus")
+		panic("Call BuildSystem first to setup Octopus")
 	}
 	go func() {
 		o.inputUrlStrChan <- baseUrlStr

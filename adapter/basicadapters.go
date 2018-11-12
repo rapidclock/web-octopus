@@ -9,7 +9,11 @@ import (
 	oct "github.com/rapidclock/web-octopus/octopus"
 )
 
-// StdOpAdapter is an output adapter that just prints the output onto the screen.
+// StdOpAdapter is an output adapter that just prints the output onto the
+// screen.
+//
+// Sample Output Format is:
+// 	LinkNum - Depth - Url
 type StdOpAdapter struct{}
 
 func (s *StdOpAdapter) Consume() *oct.NodeChSet {
@@ -22,10 +26,12 @@ func (s *StdOpAdapter) Consume() *oct.NodeChSet {
 		},
 	}
 	go func() {
+		i := 1
 		for {
 			select {
 			case output := <-listenCh:
-				fmt.Printf("%d - %s\n", output.Depth, output.UrlString)
+				fmt.Printf("%d - %d - %s\n", i, output.Depth, output.UrlString)
+				i++
 			case <-quitCh:
 				return
 			}
@@ -34,7 +40,10 @@ func (s *StdOpAdapter) Consume() *oct.NodeChSet {
 	return listenChSet
 }
 
-// FileWriterAdapter is an output adapter that writes the output to a specified file.
+// FileWriterAdapter is an output adapter that writes the output to a
+// specified file.
+// Sample Output Format is:
+// 	Depth - Url
 type FileWriterAdapter struct {
 	FilePath string
 }
