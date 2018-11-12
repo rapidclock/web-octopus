@@ -10,9 +10,10 @@ func (o *octopus) makeLimitCrawlPipe(inChSet *NodeChSet) *NodeChSet {
 
 func (o *octopus) checkWithinLimit(node *Node, outChSet *NodeChSet) {
 	if v := atomic.AddInt64(&o.crawledUrlCounter,
-		1); v < o.MaxCrawledUrls {
+		1); v <= o.MaxCrawledUrls {
 		outChSet.NodeCh <- node
 	} else {
 		outChSet.QuitCh <- 1
+		o.masterQuitCh <- 1
 	}
 }

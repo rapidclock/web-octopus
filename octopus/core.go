@@ -28,11 +28,8 @@ func (o *octopus) setupTimeToQuit() {
 }
 
 func (o *octopus) setupMaxLinksCrawled() {
-	switch {
-	case o.MaxCrawledUrls == 0:
+	if o.MaxCrawledUrls == 0 {
 		panic("MaxCrawledUrls should either be negative or greater than 0.")
-	case o.MaxCrawledUrls > 0:
-		o.MaxCrawledUrls++ // done for convenience.
 	}
 }
 
@@ -59,7 +56,15 @@ func (o *octopus) SetupSystem() {
 	pageParseChSet := o.makeParseNodeFromHtmlPipe(ingestChSet)
 	depthLimitChSet := o.makeCrawlDepthFilterPipe(pageParseChSet)
 	maxDelayChSet := o.makeMaxDelayPipe(depthLimitChSet)
-	distributorChSet := o.makeDistributorPipe(maxDelayChSet, outAdapterChSet)
+
+	var distributorChSet *NodeChSet
+	if o.MaxCrawledUrls < 0 {
+		distributorChSet = o.makeDistributorPipe(maxDelayChSet, outAdapterChSet)
+	} else {
+		maxLinksCrawledChSet := o.makeLimitCrawlPipe(outAdapterChSet)
+		distributorChSet = o.makeDistributorPipe(maxDelayChSet, maxLinksCrawledChSet)
+	}
+
 	pageReqChSet := o.makePageRequisitionPipe(distributorChSet)
 	invUrlFilterChSet := o.makeInvalidUrlFilterPipe(pageReqChSet)
 	dupFilterChSet := o.makeDuplicateUrlFilterPipe(invUrlFilterChSet)

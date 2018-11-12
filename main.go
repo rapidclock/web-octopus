@@ -9,6 +9,7 @@ func main() {
 	opAdapter := &adapter.StdOpAdapter{}
 	options := octopus.GetDefaultCrawlOptions()
 	options.OpAdapter = opAdapter
+	options.MaxCrawledUrls = 150
 	crawler := octopus.New(options)
 	crawler.SetupSystem()
 	crawler.BeginCrawling("https://www.macrumors.com")

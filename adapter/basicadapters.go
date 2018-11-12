@@ -22,10 +22,12 @@ func (s *StdOpAdapter) Consume() *oct.NodeChSet {
 		},
 	}
 	go func() {
+		i := 1
 		for {
 			select {
 			case output := <-listenCh:
-				fmt.Printf("%d - %s\n", output.Depth, output.UrlString)
+				fmt.Printf("%d - %d - %s\n", i, output.Depth, output.UrlString)
+				i++
 			case <-quitCh:
 				return
 			}
