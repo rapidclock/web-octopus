@@ -12,13 +12,14 @@ import (
 // to an instance of the crawler.
 type octopus struct {
 	*CrawlOptions
-	visited         *sync.Map
-	isReady         bool
-	adapterChSet    *NodeChSet
-	isValidProtocol map[string]bool
-	timeToQuit      time.Duration
-	inputUrlStrChan chan string
-	masterQuitCh    chan int
+	visited           *sync.Map
+	isReady           bool
+	adapterChSet      *NodeChSet
+	isValidProtocol   map[string]bool
+	timeToQuit        time.Duration
+	inputUrlStrChan   chan string
+	masterQuitCh      chan int
+	crawledUrlCounter int64
 }
 
 // CrawlOptions is used to house options for crawling.
@@ -29,7 +30,7 @@ type octopus struct {
 // 	MaxCrawlDepth - Indicates the maximum depth that will be crawled,
 // 	for each new link.
 //
-// 	MaxCrawlLinks - Specifies the Maximum Number of Unique Links that will be crawled.
+// 	MaxCrawledUrls - Specifies the Maximum Number of Unique Links that will be crawled.
 // 	Note : When combined with DepthPerLink, it will combine both.
 // 	Use -1 to indicate infinite links to be crawled (only bounded by depth of traversal).
 //
@@ -54,7 +55,7 @@ type octopus struct {
 // 	generated before the crawler quits. This is in seconds.
 type CrawlOptions struct {
 	MaxCrawlDepth      int64
-	MaxCrawlLinks      int64
+	MaxCrawledUrls     int64
 	StayWithinBaseHost bool
 	CrawlRate          int64
 	RespectRobots      bool

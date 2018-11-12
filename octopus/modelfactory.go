@@ -45,9 +45,9 @@ func createNode(parentUrlStr, urlStr string, depth int64) *Node {
 func GetDefaultCrawlOptions() *CrawlOptions {
 	return &CrawlOptions{
 		MaxCrawlDepth:      defaultMaxDepth,
-		MaxCrawlLinks:      defaultCrawlLimit,
+		MaxCrawledUrls:     defaultCrawlLimit,
 		StayWithinBaseHost: false,
-		CrawlRate:    -1,
+		CrawlRate:          -1,
 		RespectRobots:      false,
 		IncludeBody:        true,
 		OpAdapter:          nil,

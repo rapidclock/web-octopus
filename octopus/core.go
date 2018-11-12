@@ -9,6 +9,7 @@ import (
 func (o *octopus) setupOctopus() {
 	o.setupValidProtocolMap()
 	o.setupTimeToQuit()
+	o.setupMaxLinksCrawled()
 }
 
 func (o *octopus) setupValidProtocolMap() {
@@ -23,6 +24,15 @@ func (o *octopus) setupTimeToQuit() {
 		o.timeToQuit = time.Duration(o.TimeToQuit) * time.Second
 	} else {
 		log.Fatalln("TimeToQuit is not greater than 0")
+	}
+}
+
+func (o *octopus) setupMaxLinksCrawled() {
+	switch {
+	case o.MaxCrawledUrls == 0:
+		panic("MaxCrawledUrls should either be negative or greater than 0.")
+	case o.MaxCrawledUrls > 0:
+		o.MaxCrawledUrls++ // done for convenience.
 	}
 }
 
@@ -64,7 +74,7 @@ func (o *octopus) SetupSystem() {
 
 func (o *octopus) BeginCrawling(baseUrlStr string) {
 	if !o.isReady {
-		log.Fatal("Call BuildSystem first to setup Octopus")
+		panic("Call BuildSystem first to setup Octopus")
 	}
 	go func() {
 		o.inputUrlStrChan <- baseUrlStr
