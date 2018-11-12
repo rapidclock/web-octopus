@@ -41,12 +41,13 @@ func createNode(parentUrlStr, urlStr string, depth int64) *Node {
 	}
 }
 
+// Returns an instance of CrawlOptions with the values set to sensible defaults.
 func GetDefaultCrawlOptions() *CrawlOptions {
 	return &CrawlOptions{
 		MaxCrawlDepth:      defaultMaxDepth,
 		MaxCrawlLinks:      defaultCrawlLimit,
 		StayWithinBaseHost: false,
-		CrawlRatePerSec:    -1,
+		CrawlRate:    -1,
 		RespectRobots:      false,
 		IncludeBody:        true,
 		OpAdapter:          nil,
@@ -55,6 +56,7 @@ func GetDefaultCrawlOptions() *CrawlOptions {
 	}
 }
 
+// Utility function to create a NodeChSet given a created Node and Quit Channel.
 func MakeNodeChSet(nodeCh chan<- *Node, quitCh chan<- int) *NodeChSet {
 	return &NodeChSet{
 		NodeCh: nodeCh,
