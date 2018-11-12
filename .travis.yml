@@ -1,3 +1,10 @@
+sudo: false
+
 language: go
 go:
   - "1.11"
+
+script:
+  - go doc octopus
+  - go doc adapter
+  - go test -v ./...
