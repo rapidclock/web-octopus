@@ -10,6 +10,7 @@ A concurent web crawler to crawl the web.
 - Filter Duplicates.
 - Filter URLs that fail a HEAD request.
 - User specifiable max timeout between two successive url requests.
+- Max Number of Links to be crawled.
 
 
 ### Sample Implementation Snippet
