@@ -73,7 +73,11 @@ func (fw *FileWriterAdapter) writeToFile(listenCh chan *oct.Node,
 		for {
 			select {
 			case output := <-listenCh:
-				fmt.Fprintf(fp, "%d - %s\n", output.Depth, output.UrlString)
+				_, err = fmt.Fprintf(fp, "%d - %s\n", output.Depth,
+					output.UrlString)
+				if err != nil {
+					log.Println("File Error - ", err)
+				}
 			case <-quitCh:
 				return
 			}

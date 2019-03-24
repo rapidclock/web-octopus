@@ -2,36 +2,8 @@ package octopus
 
 import (
 	"fmt"
-	"log"
 	"time"
 )
-
-func (o *octopus) setupOctopus() {
-	o.setupValidProtocolMap()
-	o.setupTimeToQuit()
-	o.setupMaxLinksCrawled()
-}
-
-func (o *octopus) setupValidProtocolMap() {
-	o.isValidProtocol = make(map[string]bool)
-	for _, protocol := range o.ValidProtocols {
-		o.isValidProtocol[protocol] = true
-	}
-}
-
-func (o *octopus) setupTimeToQuit() {
-	if o.TimeToQuit > 0 {
-		o.timeToQuit = time.Duration(o.TimeToQuit) * time.Second
-	} else {
-		log.Fatalln("TimeToQuit is not greater than 0")
-	}
-}
-
-func (o *octopus) setupMaxLinksCrawled() {
-	if o.MaxCrawledUrls == 0 {
-		panic("MaxCrawledUrls should either be negative or greater than 0.")
-	}
-}
 
 func (o *octopus) SetupSystem() {
 	o.isReady = false
@@ -57,16 +29,12 @@ func (o *octopus) SetupSystem() {
 	depthLimitChSet := o.makeCrawlDepthFilterPipe(pageParseChSet)
 	maxDelayChSet := o.makeMaxDelayPipe(depthLimitChSet)
 
-	var distributorChSet *NodeChSet
-	if o.MaxCrawledUrls < 0 {
-		distributorChSet = o.makeDistributorPipe(maxDelayChSet, outAdapterChSet)
-	} else {
-		maxLinksCrawledChSet := o.makeLimitCrawlPipe(outAdapterChSet)
-		distributorChSet = o.makeDistributorPipe(maxDelayChSet, maxLinksCrawledChSet)
-	}
+	distributorChSet := o.handleDistributorPipeline(maxDelayChSet, outAdapterChSet)
 
 	pageReqChSet := o.makePageRequisitionPipe(distributorChSet)
-	invUrlFilterChSet := o.makeInvalidUrlFilterPipe(pageReqChSet)
+
+	invUrlFilterChSet := o.handleRateLimitingPipeline(pageReqChSet)
+
 	dupFilterChSet := o.makeDuplicateUrlFilterPipe(invUrlFilterChSet)
 	protoFilterChSet := o.makeUrlProtocolFilterPipe(dupFilterChSet)
 	linkAbsChSet := o.makeLinkAbsolutionPipe(protoFilterChSet)
@@ -75,6 +43,28 @@ func (o *octopus) SetupSystem() {
 
 	<-time.After(500 * time.Millisecond)
 	o.isReady = true
+}
+
+func (o *octopus) handleDistributorPipeline(maxDelayChSet, outAdapterChSet *NodeChSet) *NodeChSet {
+	var distributorChSet *NodeChSet
+	if o.MaxCrawledUrls < 0 {
+		distributorChSet = o.makeDistributorPipe(maxDelayChSet, outAdapterChSet)
+	} else {
+		maxLinksCrawledChSet := o.makeCrawlLinkCountLimitPipe(outAdapterChSet)
+		distributorChSet = o.makeDistributorPipe(maxDelayChSet, maxLinksCrawledChSet)
+	}
+	return distributorChSet
+}
+
+func (o *octopus) handleRateLimitingPipeline(pageReqChSet *NodeChSet) *NodeChSet {
+	var invUrlFilterChSet *NodeChSet
+	if o.rateLimiter != nil {
+		rateLimitingChSet := o.makeRateLimitingPipe(pageReqChSet)
+		invUrlFilterChSet = o.makeInvalidUrlFilterPipe(rateLimitingChSet)
+	} else {
+		invUrlFilterChSet = o.makeInvalidUrlFilterPipe(pageReqChSet)
+	}
+	return invUrlFilterChSet
 }
 
 func (o *octopus) BeginCrawling(baseUrlStr string) {

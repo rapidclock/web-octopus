@@ -6,7 +6,7 @@ import (
 )
 
 func (o *octopus) makeLinkAbsolutionPipe(outChSet *NodeChSet) *NodeChSet {
-	return stdLinearNodeFunc(makeLinkAbsolute, outChSet)
+	return stdLinearNodeFunc(makeLinkAbsolute, outChSet, "Link Absolution")
 }
 
 func makeLinkAbsolute(node *Node, outChSet *NodeChSet) {

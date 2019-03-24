@@ -6,7 +6,8 @@ import (
 
 type stdFunc func(*Node, *NodeChSet)
 
-func stdLinearNodeFunc(stdFn stdFunc, outChSet *NodeChSet) *NodeChSet {
+func stdLinearNodeFunc(stdFn stdFunc, outChSet *NodeChSet,
+	functionTag string) *NodeChSet {
 	listenCh := make(chan *Node)
 	listenQuitCh := make(chan int, 1)
 	listenChSet := MakeNodeChSet(listenCh, listenQuitCh)
@@ -19,7 +20,7 @@ func stdLinearNodeFunc(stdFn stdFunc, outChSet *NodeChSet) *NodeChSet {
 				}
 			case <-listenQuitCh:
 				{
-					fmt.Println("Quit Received on Internal Channel")
+					fmt.Printf("Quit Received on %s Channel\n", functionTag)
 					outChSet.QuitCh <- 1
 					return
 				}

@@ -4,8 +4,8 @@ import (
 	"sync/atomic"
 )
 
-func (o *octopus) makeLimitCrawlPipe(inChSet *NodeChSet) *NodeChSet {
-	return stdLinearNodeFunc(o.checkWithinLimit, inChSet)
+func (o *octopus) makeCrawlLinkCountLimitPipe(inChSet *NodeChSet) *NodeChSet {
+	return stdLinearNodeFunc(o.checkWithinLimit, inChSet, "Crawl Link Limit")
 }
 
 func (o *octopus) checkWithinLimit(node *Node, outChSet *NodeChSet) {
