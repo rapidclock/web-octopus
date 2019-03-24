@@ -29,6 +29,8 @@ func main() {
 	options := octopus.GetDefaultCrawlOptions()
 	options.MaxCrawlDepth = 3
 	options.TimeToQuit = 10
+	options.CrawlRatePerSec = 5
+	options.CrawlBurstLimitPerSec = 8
 	options.OpAdapter = opAdapter
 	
 	crawler := octopus.New(options)
@@ -43,20 +45,22 @@ Customizations can be made by supplying the crawler an instance of `CrawlOptions
 
 ```go
 type CrawlOptions struct {
-	MaxCrawlDepth      int64 // Max Depth of Crawl, 0 is the initial link.
-	MaxCrawledUrls     int64 // Max number of links to be crawled in total.
-	StayWithinBaseHost bool // [Not-Implemented-Yet]
-	CrawlRate          int64 // Max Rate at which requests can be made (req/sec).
-	CrawlBurstLimit    int64 // Max Burst Capacity (should be atleast the crawl rate).
-	RespectRobots      bool // [Not-Implemented-Yet]
-	IncludeBody        bool // Include the Request Body (Contents of the web page) in the result of the crawl.
-	OpAdapter          OutputAdapter // A user defined crawl output handler (See next section for info).
-	ValidProtocols     []string // Valid protocols to crawl (http, https, ftp, etc.)
-	TimeToQuit         int64 // Timeout (seconds) between two attempts or requests, before the crawler quits.
+	MaxCrawlDepth         int64 // Max Depth of Crawl, 0 is the initial link.
+	MaxCrawledUrls        int64 // Max number of links to be crawled in total.
+	StayWithinBaseHost    bool // [Not-Implemented-Yet]
+	CrawlRatePerSec       int64 // Max Rate at which requests can be made (req/sec).
+	CrawlBurstLimitPerSec int64 // Max Burst Capacity (should be atleast the crawl rate).
+	RespectRobots         bool // [Not-Implemented-Yet]
+	IncludeBody           bool // Include the Request Body (Contents of the web page) in the result of the crawl.
+	OpAdapter             OutputAdapter // A user defined crawl output handler (See next section for info).
+	ValidProtocols        []string // Valid protocols to crawl (http, https, ftp, etc.)
+	TimeToQuit            int64 // Timeout (seconds) between two attempts or requests, before the crawler quits.
 }
 ```
 
 A default instance of the `CrawlOptions` can be obtained by calling `octopus.GetDefaultCrawlOptions()`. This can be further customized by overriding individual properties.
+
+**NOTE:** If rate-limiting is not required, then just ignore(don't set value) both `CrawlRatePerSec` and `CrawlBurstLimitPerSec` in the `CrawlOptions`.
 
 ### Output Adapters
 
