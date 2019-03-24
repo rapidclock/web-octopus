@@ -5,11 +5,15 @@ import (
 )
 
 func (o *octopus) makeParseNodeFromHtmlPipe(outChSet *NodeChSet) *NodeChSet {
-	return stdLinearNodeFunc(parseHtmlPage, outChSet)
+	return stdLinearNodeFunc(parseHtmlPage, outChSet, "Link Parsing")
 }
 
 func parseHtmlPage(node *Node, outChSet *NodeChSet) {
-	defer node.Body.Close()
+	defer func() {
+		if node != nil && node.Body != nil {
+			node.Body.Close()
+		}
+	}()
 	z := html.NewTokenizer(node.Body)
 	for {
 		tt := z.Next()

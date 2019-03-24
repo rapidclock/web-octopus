@@ -1,7 +1,7 @@
 package octopus
 
 func (o *octopus) makeDuplicateUrlFilterPipe(outChSet *NodeChSet) *NodeChSet {
-	return stdLinearNodeFunc(o.filterDuplicates, outChSet)
+	return stdLinearNodeFunc(o.filterDuplicates, outChSet, "Dupliacate Filter")
 }
 
 func (o *octopus) filterDuplicates(node *Node, outChSet *NodeChSet) {

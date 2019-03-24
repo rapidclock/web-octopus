@@ -5,7 +5,8 @@ import (
 )
 
 func (o *octopus) makeUrlProtocolFilterPipe(outChSet *NodeChSet) *NodeChSet {
-	return stdLinearNodeFunc(o.filterByProtocol, outChSet)
+	return stdLinearNodeFunc(o.filterByProtocol, outChSet,
+		"Link Protocol Filter")
 }
 
 func (o *octopus) filterByProtocol(node *Node, outChSet *NodeChSet) {

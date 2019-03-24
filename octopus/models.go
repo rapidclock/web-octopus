@@ -4,6 +4,8 @@ import (
 	"io"
 	"sync"
 	"time"
+
+	"golang.org/x/time/rate"
 )
 
 // octopus is a concurrent web crawler.
@@ -20,6 +22,8 @@ type octopus struct {
 	inputUrlStrChan   chan string
 	masterQuitCh      chan int
 	crawledUrlCounter int64
+	rateLimiter       *rate.Limiter
+	requestTimeout    uint64
 }
 
 // CrawlOptions is used to house options for crawling.
@@ -37,8 +41,11 @@ type octopus struct {
 // 	StayWithinBaseHost - (unimplemented) Ensures crawler stays within the
 // 	level 1 link's hostname.
 //
-// 	CrawlRate (unimplemented) is the rate at which requests will be made.
-// 	In seconds
+// 	CrawlRatePerSec - is the rate at which requests will be made (per second).
+// 	If this is negative, Crawl feature will be ignored. Default is negative.
+//
+// 	CrawlBurstLimitPerSec - Represents the max burst capacity with which requests
+// 	can be made. This must be greater than or equal to the CrawlRatePerSec.
 //
 // 	RespectRobots (unimplemented) choose whether to respect robots.txt or not.
 //
@@ -54,15 +61,16 @@ type octopus struct {
 // 	TimeToQuit - represents the total time to wait between two new nodes to be
 // 	generated before the crawler quits. This is in seconds.
 type CrawlOptions struct {
-	MaxCrawlDepth      int64
-	MaxCrawledUrls     int64
-	StayWithinBaseHost bool
-	CrawlRate          int64
-	RespectRobots      bool
-	IncludeBody        bool
-	OpAdapter          OutputAdapter
-	ValidProtocols     []string
-	TimeToQuit         int64
+	MaxCrawlDepth         int64
+	MaxCrawledUrls        int64
+	StayWithinBaseHost    bool
+	CrawlRatePerSec       int64
+	CrawlBurstLimitPerSec int64
+	RespectRobots         bool
+	IncludeBody           bool
+	OpAdapter             OutputAdapter
+	ValidProtocols        []string
+	TimeToQuit            int64
 }
 
 // NodeInfo is used to represent each crawled link and its associated crawl depth.

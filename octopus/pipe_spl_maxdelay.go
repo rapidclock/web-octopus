@@ -28,7 +28,7 @@ func connectWithTimeout(listenNodeCh <-chan *Node, listenQuitCh <-chan int,
 			opNodeChSet.QuitCh <- i
 			return
 		case <-timer.C:
-			fmt.Println("Timeout Triggered in MaxDelayTimeout Channel")
+			fmt.Println("Timeout Triggered in Max Delay Timeout Channel")
 			opNodeChSet.QuitCh <- 1
 			return
 		}

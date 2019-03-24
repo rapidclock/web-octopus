@@ -24,7 +24,8 @@ The overview of the Pipeline is given below:
 	3. Protocol Filter
 	4. Duplicate Filter
 	5. Invalid Url Filter (Urls whose HEAD request Fails)
-	6. Make GET Request
+	(5x) (Optional) Crawl Rate Limiter.
+	[6]. Make GET Request
 	7a. Send to Output Adapter
 	7b. Check for Timeout (gap between two output on this channel).
 	8. Max Links Crawled Limit Filter
@@ -32,6 +33,6 @@ The overview of the Pipeline is given below:
 	10. Parse Page for more URLs.
 
 Note: The output from 7b. is fed to 8.
-	1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7b -> 8 -> 9 -> 10 -> 1
- */
+	1 -> 2 -> 3 -> 4 -> 5 -> (5x) -> [6] -> 7b -> 8 -> 9 -> 10 -> 1
+*/
 package octopus
