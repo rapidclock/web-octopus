@@ -1,7 +1,13 @@
 # web-octopus
+[![GoDoc](https://godoc.org/github.com/rapidclock/web-octopus/pq?status.svg)](https://godoc.org/github.com/rapidclock/web-octopus)
 [![Build Status](https://travis-ci.com/rapidclock/web-octopus.svg?token=hJhLfHtyz41UyuLTTdFx&branch=master)](https://travis-ci.com/rapidclock/web-octopus)
 <br>
 A concurent web crawler written in Go.
+
+## Install
+
+	go get github.com/rapidclock/web-octopus/octopus
+	go get github.com/rapidclock/web-octopus/adapter
 
 ## Current Features:
 - Depth Limited Crawling
