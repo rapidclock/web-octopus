@@ -1,0 +1,53 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-go-module:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+
+      - name: Validate release tag format and VERSION match
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          case "$TAG" in
+            v*) ;;
+            *)
+              echo "Release tag must start with 'v' (got: $TAG)"
+              exit 1
+              ;;
+          esac
+
+          TAG_NO_V="${TAG#v}"
+          VERSION_FILE=$(tr -d '[:space:]' < VERSION)
+          test "$TAG_NO_V" = "$VERSION_FILE"
+
+      - name: Trigger Go module proxy indexing
+        env:
+          MODULE: github.com/rapidclock/web-octopus
+        run: |
+          set -euxo pipefail
+          VERSION="${{ github.event.release.tag_name }}"
+          curl -fsSL "https://proxy.golang.org/${MODULE}/@v/${VERSION}.info"
+
+      - name: Trigger pkg.go.dev refresh
+        env:
+          MODULE: github.com/rapidclock/web-octopus
+        run: |
+          set -euxo pipefail
+          VERSION="${{ github.event.release.tag_name }}"
+          curl -fsSL "https://pkg.go.dev/fetch/${MODULE}@${VERSION}"

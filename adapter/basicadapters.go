@@ -13,7 +13,8 @@ import (
 // screen.
 //
 // Sample Output Format is:
-// 	LinkNum - Depth - Url
+//
+//	LinkNum - Depth - Url
 type StdOpAdapter struct{}
 
 func (s *StdOpAdapter) Consume() *oct.NodeChSet {
@@ -43,7 +44,8 @@ func (s *StdOpAdapter) Consume() *oct.NodeChSet {
 // FileWriterAdapter is an output adapter that writes the output to a
 // specified file.
 // Sample Output Format is:
-// 	Depth - Url
+//
+//	Depth - Url
 type FileWriterAdapter struct {
 	FilePath string
 }
@@ -65,8 +67,8 @@ func (fw *FileWriterAdapter) writeToFile(listenCh chan *oct.Node,
 	quitCh chan int) {
 	fp, err := fw.getFilePointer()
 	if err != nil {
-		fp.Close()
-		log.Fatal(err)
+		log.Printf("failed to open output file %q: %v", fw.FilePath, err)
+		return
 	}
 	go func() {
 		defer fp.Close()
@@ -86,6 +88,6 @@ func (fw *FileWriterAdapter) writeToFile(listenCh chan *oct.Node,
 }
 
 func (fw *FileWriterAdapter) getFilePointer() (w io.WriteCloser, err error) {
-	w, err = os.OpenFile(fw.FilePath, os.O_RDWR|os.O_CREATE, 0644)
+	w, err = os.OpenFile(fw.FilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	return
 }

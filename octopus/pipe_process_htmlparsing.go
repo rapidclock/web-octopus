@@ -1,8 +1,6 @@
 package octopus
 
-import (
-	"golang.org/x/net/html"
-)
+import "golang.org/x/net/html"
 
 func (o *octopus) makeParseNodeFromHtmlPipe(outChSet *NodeChSet) *NodeChSet {
 	return stdLinearNodeFunc(parseHtmlPage, outChSet, "Link Parsing")
@@ -14,6 +12,9 @@ func parseHtmlPage(node *Node, outChSet *NodeChSet) {
 			node.Body.Close()
 		}
 	}()
+	if node == nil || node.Body == nil {
+		return
+	}
 	z := html.NewTokenizer(node.Body)
 	for {
 		tt := z.Next()
