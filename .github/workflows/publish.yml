@@ -37,7 +37,12 @@ jobs:
 
           TAG_NO_V="${TAG#v}"
           VERSION_FILE=$(tr -d '[:space:]' < VERSION)
-          test "$TAG_NO_V" = "$VERSION_FILE"
+          if ! test "$TAG_NO_V" = "$VERSION_FILE"; then
+            echo "Release tag version does not match VERSION file"
+            echo "  tag version (without 'v'): $TAG_NO_V"
+            echo "  VERSION file:              $VERSION_FILE"
+            exit 1
+          fi
 
       - name: Trigger Go module proxy indexing
         env:

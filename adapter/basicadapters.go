@@ -68,6 +68,17 @@ func (fw *FileWriterAdapter) writeToFile(listenCh chan *oct.Node,
 	fp, err := fw.getFilePointer()
 	if err != nil {
 		log.Printf("failed to open output file %q: %v", fw.FilePath, err)
+		// Start a fallback goroutine to drain listenCh so producers do not block.
+		go func() {
+			for {
+				select {
+				case <-listenCh:
+					// Discard messages; file is not available.
+				case <-quitCh:
+					return
+				}
+			}
+		}()
 		return
 	}
 	go func() {

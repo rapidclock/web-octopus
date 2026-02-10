@@ -7,6 +7,3 @@ require (
 	golang.org/x/time v0.10.0
 )
 
-replace golang.org/x/net => github.com/golang/net v0.35.0
-
-replace golang.org/x/time => github.com/golang/time v0.10.0
