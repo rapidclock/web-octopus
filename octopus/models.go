@@ -16,14 +16,12 @@ type octopus struct {
 	*CrawlOptions
 	visited           *sync.Map
 	isReady           bool
-	adapterChSet      *NodeChSet
 	isValidProtocol   map[string]bool
 	timeToQuit        time.Duration
 	inputUrlStrChan   chan string
 	masterQuitCh      chan int
 	crawledUrlCounter int64
 	rateLimiter       *rate.Limiter
-	requestTimeout    uint64
 }
 
 // CrawlOptions is used to house options for crawling.
