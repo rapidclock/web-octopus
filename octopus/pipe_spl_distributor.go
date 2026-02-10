@@ -3,7 +3,7 @@ package octopus
 // makeDistributorPipe - Distributes any node received on its listen channel
 // to the list of channels passed into this.
 // Basically this behaves like a repeater or a hub.
-func (o *octopus) makeDistributorPipe(outChSetList ... *NodeChSet) (
+func (o *octopus) makeDistributorPipe(outChSetList ...*NodeChSet) (
 	listenChSet *NodeChSet) {
 	listenCh := make(chan *Node)
 	listenQuitCh := make(chan int, 1)
@@ -18,9 +18,7 @@ func (o *octopus) makeDistributorPipe(outChSetList ... *NodeChSet) (
 }
 
 func distribute(listenCh chan *Node, listenQuitCh chan int,
-	outChSetList ... *NodeChSet) {
-	defer close(listenCh)
-	defer close(listenQuitCh)
+	outChSetList ...*NodeChSet) {
 	for {
 		select {
 		case node := <-listenCh:
@@ -32,13 +30,12 @@ func distribute(listenCh chan *Node, listenQuitCh chan int,
 				}
 			}
 		case <-listenQuitCh:
-			{
-				for _, outChSet := range outChSetList {
-					if outChSet != nil {
-						outChSet.QuitCh <- 1
-					}
+			for _, outChSet := range outChSetList {
+				if outChSet != nil {
+					outChSet.QuitCh <- 1
 				}
 			}
+			return
 		}
 	}
 }

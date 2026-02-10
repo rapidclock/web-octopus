@@ -1,7 +1,6 @@
 package octopus
 
 import (
-	"log"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -25,7 +24,7 @@ func (o *octopus) setupTimeToQuit() {
 	if o.TimeToQuit > 0 {
 		o.timeToQuit = time.Duration(o.TimeToQuit) * time.Second
 	} else {
-		log.Fatalln("TimeToQuit is not greater than 0")
+		panic("TimeToQuit is not greater than 0")
 	}
 }
 

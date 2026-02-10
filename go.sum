@@ -1,0 +1,4 @@
+github.com/golang/net v0.35.0 h1:PozKZpK7ktpdVnmhjJPp6Qwol8S+hFnfYKxMcMeX7aQ=
+github.com/golang/net v0.35.0/go.mod h1:EglIi67kWsHKlRzzVMUD93VMSWGFOMSZgxFjparz1Qk=
+github.com/golang/time v0.10.0 h1:6O5iMEWv8U6TO7Za6tqWgOj0J7QgqpQB1Np+Yzoa/dg=
+github.com/golang/time v0.10.0/go.mod h1:3BpzKBy/shNhVucY/MWOyx10tF3SFh9QdLuxbVysPQM=
