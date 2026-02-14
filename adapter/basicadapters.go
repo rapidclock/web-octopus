@@ -82,7 +82,11 @@ func (fw *FileWriterAdapter) writeToFile(listenCh chan *oct.Node,
 		return
 	}
 	go func() {
-		defer fp.Close()
+		defer func() {
+			if err := fp.Close(); err != nil {
+				log.Printf("failed to close output file %q: %v", fw.FilePath, err)
+			}
+		}()
 		for {
 			select {
 			case output := <-listenCh:
