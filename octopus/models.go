@@ -16,14 +16,12 @@ type octopus struct {
 	*CrawlOptions
 	visited           *sync.Map
 	isReady           bool
-	adapterChSet      *NodeChSet
 	isValidProtocol   map[string]bool
 	timeToQuit        time.Duration
 	inputUrlStrChan   chan string
 	masterQuitCh      chan int
 	crawledUrlCounter int64
 	rateLimiter       *rate.Limiter
-	requestTimeout    uint64
 }
 
 // CrawlOptions is used to house options for crawling.
@@ -31,35 +29,35 @@ type octopus struct {
 // You can specify depth of exploration for each link,
 // if crawler should ignore other host names (except from base host).
 //
-// 	MaxCrawlDepth - Indicates the maximum depth that will be crawled,
-// 	for each new link.
+//	MaxCrawlDepth - Indicates the maximum depth that will be crawled,
+//	for each new link.
 //
-// 	MaxCrawledUrls - Specifies the Maximum Number of Unique Links that will be crawled.
-// 	Note : When combined with DepthPerLink, it will combine both.
-// 	Use -1 to indicate infinite links to be crawled (only bounded by depth of traversal).
+//	MaxCrawledUrls - Specifies the Maximum Number of Unique Links that will be crawled.
+//	Note : When combined with DepthPerLink, it will combine both.
+//	Use -1 to indicate infinite links to be crawled (only bounded by depth of traversal).
 //
-// 	StayWithinBaseHost - (unimplemented) Ensures crawler stays within the
-// 	level 1 link's hostname.
+//	StayWithinBaseHost - (unimplemented) Ensures crawler stays within the
+//	level 1 link's hostname.
 //
-// 	CrawlRatePerSec - is the rate at which requests will be made (per second).
-// 	If this is negative, Crawl feature will be ignored. Default is negative.
+//	CrawlRatePerSec - is the rate at which requests will be made (per second).
+//	If this is negative, Crawl feature will be ignored. Default is negative.
 //
-// 	CrawlBurstLimitPerSec - Represents the max burst capacity with which requests
-// 	can be made. This must be greater than or equal to the CrawlRatePerSec.
+//	CrawlBurstLimitPerSec - Represents the max burst capacity with which requests
+//	can be made. This must be greater than or equal to the CrawlRatePerSec.
 //
-// 	RespectRobots (unimplemented) choose whether to respect robots.txt or not.
+//	RespectRobots (unimplemented) choose whether to respect robots.txt or not.
 //
-// 	IncludeBody - (unimplemented) Include the response Body in the crawled
-// 	NodeInfo (for further processing).
+//	IncludeBody - (unimplemented) Include the response Body in the crawled
+//	NodeInfo (for further processing).
 //
-// 	OpAdapter is a user specified concrete implementation of an Output Adapter. The crawler
-// 	will pump output onto the implementation's channel returned by its Consume method.
+//	OpAdapter is a user specified concrete implementation of an Output Adapter. The crawler
+//	will pump output onto the implementation's channel returned by its Consume method.
 //
-// 	ValidProtocols - This is an array containing the list of url protocols that
-// 	should be crawled.
+//	ValidProtocols - This is an array containing the list of url protocols that
+//	should be crawled.
 //
-// 	TimeToQuit - represents the total time to wait between two new nodes to be
-// 	generated before the crawler quits. This is in seconds.
+//	TimeToQuit - represents the total time to wait between two new nodes to be
+//	generated before the crawler quits. This is in seconds.
 type CrawlOptions struct {
 	MaxCrawlDepth         int64
 	MaxCrawledUrls        int64

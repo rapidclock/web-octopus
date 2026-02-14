@@ -1,9 +1,6 @@
 package octopus
 
-import (
-	"log"
-	"net/url"
-)
+import "net/url"
 
 func (o *octopus) makeLinkAbsolutionPipe(outChSet *NodeChSet) *NodeChSet {
 	return stdLinearNodeFunc(makeLinkAbsolute, outChSet, "Link Absolution")
@@ -11,7 +8,6 @@ func (o *octopus) makeLinkAbsolutionPipe(outChSet *NodeChSet) *NodeChSet {
 
 func makeLinkAbsolute(node *Node, outChSet *NodeChSet) {
 	if node == nil || outChSet == nil {
-		log.Fatal("NIL ERROR")
 		return
 	}
 	if node.ParentUrlString != "" {
