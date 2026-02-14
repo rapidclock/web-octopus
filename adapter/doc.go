@@ -8,5 +8,5 @@ screen). The FileWriterAdapter prints the output to a specified File.
 
 Both can be used as an OutputAdapter as part of the octopus crawler's
 CrawlOptions.
- */
+*/
 package adapter

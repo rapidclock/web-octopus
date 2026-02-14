@@ -23,10 +23,7 @@ func setupStringIngestPipe(inChSet *ingestPipeChSet, nodeOpChSet *NodeChSet,
 }
 
 func channelConnector(inChSet *ingestPipeChSet, opChSet *NodeChSet) {
-	for {
-		select {
-		case node := <-inChSet.NodeCh:
-			opChSet.NodeCh <- node
-		}
+	for node := range inChSet.NodeCh {
+		opChSet.NodeCh <- node
 	}
 }

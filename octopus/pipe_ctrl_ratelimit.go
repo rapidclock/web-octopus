@@ -1,8 +1,6 @@
 package octopus
 
-import (
-	"time"
-)
+import "time"
 
 func (o *octopus) makeRateLimitingPipe(outChSet *NodeChSet) *NodeChSet {
 	return stdLinearNodeFunc(o.rateLimit, outChSet, "Crawl Rate Limit")

@@ -1,0 +1,91 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-go-module:
+    if: github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name }}
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+
+      - name: Validate release tag format and VERSION match
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          case "$TAG" in
+            v*) ;;
+            *)
+              echo "Release tag must start with 'v' (got: $TAG)"
+              exit 1
+              ;;
+          esac
+
+          TAG_NO_V="${TAG#v}"
+          VERSION_FILE=$(tr -d '[:space:]' < VERSION)
+          if ! test "$TAG_NO_V" = "$VERSION_FILE"; then
+            echo "Release tag version does not match VERSION file"
+            echo "  tag version (without 'v'): $TAG_NO_V"
+            echo "  VERSION file:              $VERSION_FILE"
+            exit 1
+          fi
+
+      - name: Verify release tag is on main
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+          MAIN_SHA=$(git rev-parse origin/main)
+          if ! test "${GITHUB_SHA}" = "${MAIN_SHA}"; then
+            echo "Release tag is not at main HEAD; refusing to publish"
+            echo "  tag:       ${{ github.event.release.tag_name }}"
+            echo "  tag sha:   ${GITHUB_SHA}"
+            echo "  main head: ${MAIN_SHA}"
+            exit 1
+          fi
+
+      - name: Trigger Go module proxy indexing
+        env:
+          MODULE: github.com/rapidclock/web-octopus
+        run: |
+          set -euo pipefail
+          VERSION="${{ github.event.release.tag_name }}"
+          URL="https://proxy.golang.org/${MODULE}/@v/${VERSION}.info"
+          for i in 1 2 3 4 5; do
+            if curl -fsSL "$URL" >/dev/null; then
+              exit 0
+            fi
+            sleep $((i * 2))
+          done
+          echo "failed to fetch module info from proxy after retries"
+          exit 1
+
+      - name: Trigger pkg.go.dev refresh
+        env:
+          MODULE: github.com/rapidclock/web-octopus
+        run: |
+          set -euo pipefail
+          VERSION="${{ github.event.release.tag_name }}"
+          URL="https://pkg.go.dev/fetch/${MODULE}@${VERSION}"
+          for i in 1 2 3 4 5; do
+            if curl -fsSL "$URL" >/dev/null; then
+              exit 0
+            fi
+            sleep $((i * 2))
+          done
+          echo "failed to trigger pkg.go.dev refresh after retries"
+          exit 1

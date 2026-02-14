@@ -1,25 +1,46 @@
 # web-octopus
-[![GoDoc](https://godoc.org/github.com/rapidclock/web-octopus/pq?status.svg)](https://godoc.org/github.com/rapidclock/web-octopus)
-[![Build Status](https://travis-ci.com/rapidclock/web-octopus.svg?token=hJhLfHtyz41UyuLTTdFx&branch=master)](https://travis-ci.com/rapidclock/web-octopus)
-<br>
-A concurent web crawler written in Go.
-
-## Install
-
-	go get github.com/rapidclock/web-octopus/octopus
-	go get github.com/rapidclock/web-octopus/adapter
-
-## Current Features:
-- Depth Limited Crawling
-- User specified valid protocols
-- User buildable adapters that the crawler feeds output to.
-- Filter Duplicates. (Default, Non-Customizable)
-- Filter URLs that fail a HEAD request. (Default, Non-Customizable)
-- User specifiable max timeout between two successive url requests.
-- Max Number of Links to be crawled.
+[![Go Reference](https://pkg.go.dev/badge/github.com/rapidclock/web-octopus.svg)](https://pkg.go.dev/github.com/rapidclock/web-octopus@v1.3.0)
 
 
-### Sample Implementation Snippet
+A concurrent, channel-pipeline web crawler in Go.
+
+> This release modernizes the project for current Go module workflows, testing expectations, and maintainability standards.
+
+## Table of contents
+
+- [Highlights](#highlights)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Architecture](#architecture)
+- [Configuration reference](#configuration-reference)
+- [Output adapters](#output-adapters)
+- [Testing](#testing)
+- [Versioning and release](#versioning-and-release)
+- [Compatibility notes](#compatibility-notes)
+
+## Highlights
+
+- Uses Go modules (`go.mod`) instead of legacy `go get`-only workflow.
+- Includes automated unit tests for crawler defaults, validation behavior, pipeline helpers, and adapter output.
+- Improved adapter safety around file handling and error paths.
+- Expanded docs with architecture details and operational guidance.
+
+## Installation
+
+```bash
+go get github.com/rapidclock/web-octopus@v1.3.0
+```
+
+Import packages:
+
+```go
+import (
+    "github.com/rapidclock/web-octopus/adapter"
+    "github.com/rapidclock/web-octopus/octopus"
+)
+```
+
+## Quick start
 
 ```go
 package main
@@ -31,134 +52,128 @@ import (
 
 func main() {
 	opAdapter := &adapter.StdOpAdapter{}
-	
+
 	options := octopus.GetDefaultCrawlOptions()
 	options.MaxCrawlDepth = 3
 	options.TimeToQuit = 10
 	options.CrawlRatePerSec = 5
 	options.CrawlBurstLimitPerSec = 8
 	options.OpAdapter = opAdapter
-	
+
 	crawler := octopus.New(options)
 	crawler.SetupSystem()
 	crawler.BeginCrawling("https://www.example.com")
 }
 ```
 
-### List of customizations
+## Architecture
 
-Customizations can be made by supplying the crawler an instance of `CrawlOptions`. The basic structure is shown below, with a brief explanation for each option.
+`web-octopus` uses a staged channel pipeline. Nodes (URLs + metadata) flow through filter and processing stages:
+
+1. Ingest
+2. Link absolution
+3. Protocol filter
+4. Duplicate filter
+5. URL validation (`HEAD`)
+6. Optional rate limiter
+7. Page requisition (`GET`)
+8. Distributor
+   - Output adapter stream
+   - Max delay watchdog stream
+9. Max crawled links limiter (optional)
+10. Crawl depth filter
+11. HTML parsing back into ingest
+
+This design allows localized extension by replacing adapters and modifying options, while preserving high concurrency.
+
+## Configuration reference
+
+`CrawlOptions` controls crawler behavior:
+
+- `MaxCrawlDepth int64` — max depth for crawled nodes.
+- `MaxCrawledUrls int64` — max total unique URLs; `-1` means unlimited.
+- `CrawlRatePerSec int64` — request rate limit, negative to disable.
+- `CrawlBurstLimitPerSec int64` — burst capacity for rate limiting.
+- `IncludeBody bool` — include body in crawled node (currently internal pipeline behavior).
+- `OpAdapter OutputAdapter` — required output sink.
+- `ValidProtocols []string` — accepted URL schemes (e.g., `http`, `https`).
+- `TimeToQuit int64` — max idle seconds before automatic quit.
+
+### Defaults
+
+Use:
 
 ```go
-type CrawlOptions struct {
-	MaxCrawlDepth         int64 // Max Depth of Crawl, 0 is the initial link.
-	MaxCrawledUrls        int64 // Max number of links to be crawled in total.
-	StayWithinBaseHost    bool // [Not-Implemented-Yet]
-	CrawlRatePerSec       int64 // Max Rate at which requests can be made (req/sec).
-	CrawlBurstLimitPerSec int64 // Max Burst Capacity (should be atleast the crawl rate).
-	RespectRobots         bool // [Not-Implemented-Yet]
-	IncludeBody           bool // Include the Request Body (Contents of the web page) in the result of the crawl.
-	OpAdapter             OutputAdapter // A user defined crawl output handler (See next section for info).
-	ValidProtocols        []string // Valid protocols to crawl (http, https, ftp, etc.)
-	TimeToQuit            int64 // Timeout (seconds) between two attempts or requests, before the crawler quits.
-}
+opts := octopus.GetDefaultCrawlOptions()
 ```
 
-A default instance of the `CrawlOptions` can be obtained by calling `octopus.GetDefaultCrawlOptions()`. This can be further customized by overriding individual properties.
+Default values are tuned for local experimentation:
 
-**NOTE:** If rate-limiting is not required, then just ignore(don't set value) both `CrawlRatePerSec` and `CrawlBurstLimitPerSec` in the `CrawlOptions`.
+- Depth: `2`
+- Max links: `-1` (unbounded)
+- Rate limit: disabled
+- Protocols: `http`, `https`
+- Timeout gap: `30s`
 
-### Output Adapters
+## Output adapters
 
-An Output Adapter is the final destination of a crawler processed request. The output of the crawler is fed here, according to the customizations made before starting the crawler through the `CrawlOptions` attached to the crawler.
-
-The `OutputAdapter` is a Go Interface, that has to be implemented by your(user-defined) processor.
+The crawler emits processed nodes through the `OutputAdapter` interface:
 
 ```go
 type OutputAdapter interface {
-	Consume() *NodeChSet
+    Consume() *NodeChSet
 }
 ```
 
-The user has to implement the `Consume()` method that returns a __*pointer*__ to a `NodeChSet`. The `NodeChSet` is described below. The crawler uses the returned channel to send the crawl output. The user can start listening for output from the crawler.
+### Built-in adapters
 
-**Note** : If the user chooses to implement their custom `OutputAdapter` **REMEMBER** to listen for the output on another go-routine. Otherwise you might block the crawler from running. Atleast begin the crawling on another go-routine before you begin processing output.
+1. `adapter.StdOpAdapter`
+   - Prints `count - depth - URL` to stdout.
+2. `adapter.FileWriterAdapter`
+   - Writes `depth - URL` lines to a file.
 
-The structure of the `NodeChSet` is given below.
+### Writing a custom adapter
 
-```go
-type NodeChSet struct {
-	NodeCh chan<- *Node
-	*StdChannels
-}
+Create channels, return `*octopus.NodeChSet`, and consume nodes in a goroutine. Always handle quit signals to avoid goroutine leaks.
 
-type StdChannels struct {
-	QuitCh chan<- int
-}
+## Testing
 
-type Node struct {
-	*NodeInfo
-	Body io.ReadCloser
-}
+Run the full test suite:
 
-type NodeInfo struct {
-	ParentUrlString string
-	UrlString       string
-	Depth           int64
-}
+```bash
+go test ./...
 ```
 
-You can use the utility function `MakeDefaultNodeChSet()` to get a `NodeChSet` built for you. This also returns the `Node` and quit channels. Example given below:
+Recommended local checks before release:
 
-```go
-var opNodeChSet *NodeChSet
-var nodeCh chan *Node
-var quitCh chan int
-// above to demo the types. One can easily use go lang type erasure.
-opNodeChSet, nodeCh, quitCh = MakeDefaultNodeChSet()
+```bash
+go test ./... -race
+go vet ./...
 ```
 
-The user should supply the custom OutputAdapter as an argument to the `CrawlOptions`.
 
-#### Default Output Adapters:
+## CI/CD
 
-We supply two default Adapters for you to try out. They are not meant to be feature rich, but you can still use them. Their primary purpose is meant to be a demonstration of how to build and use a `OutputAdapter`.
+This repository uses GitHub Actions (not Travis CI):
 
-1. `adapter.StdOpAdapter` : Writes the crawled output (only links, not body) to the standard output.
-1. `adapter.FileWriterAdapter` : Writes the crawled output (only links, not body) to a supplied file.
+- **CI workflow** (`.github/workflows/ci.yml`) runs automatically on PR open/sync/reopen and on pushes to the default branch. It validates module tidiness, formatting, vet/staticcheck, and test suites (including race detection).
+- **Publish workflow** (`.github/workflows/publish.yml`) runs only when a GitHub **Release** is published (excluding prereleases), validates tag/version alignment, and triggers indexing on both the Go proxy and pkg.go.dev so new versions are discoverable quickly.
 
-#### Implementation of the `adapter.StdOpAdapter`:
-We have supplied the implementation of `adapter.StdOpAdapter` below to get a rough idea of what goes into building your own adapter.
+Release flow:
 
-```go
-// StdOpAdapter is an output adapter that just prints the output onto the
-// screen.
-//
-// Sample Output Format is:
-// 	LinkNum - Depth - Url
-type StdOpAdapter struct{}
+1. Update `VERSION` and `CHANGELOG.md`.
+2. Merge to default branch.
+3. Create and push tag `vX.Y.Z` matching `VERSION`.
+4. Publish a GitHub Release for that tag.
+5. GitHub Actions publish workflow handles Go portal refresh calls.
 
-func (s *StdOpAdapter) Consume() *oct.NodeChSet {
-	listenCh := make(chan *oct.Node)
-	quitCh := make(chan int, 1)
-	listenChSet := &oct.NodeChSet{
-		NodeCh: listenCh,
-		StdChannels: &oct.StdChannels{
-			QuitCh: quitCh,
-		},
-	}
-	go func() {
-		i := 1
-		for {
-			select {
-			case output := <-listenCh:
-				fmt.Printf("%d - %d - %s\n", i, output.Depth, output.UrlString)
-				i++
-			case <-quitCh:
-				return
-			}
-		}
-	}()
-	return listenChSet
-}
-```
+## Versioning and release
+
+- Project follows semantic versioning.
+- Current release in this repository: **v1.3.0**.
+- See `CHANGELOG.md` for release notes.
+
+## Compatibility notes
+
+- Legacy examples using old `go get` package paths still map to the same module path.
+- Existing adapters remain source-compatible.
