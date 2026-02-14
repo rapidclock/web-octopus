@@ -1,4 +1,6 @@
 # web-octopus
+[![Go Reference](https://pkg.go.dev/badge/github.com/rapidclock/web-octopus.svg)](https://pkg.go.dev/github.com/rapidclock/web-octopus@v1.3.0)
+
 
 A concurrent, channel-pipeline web crawler in Go.
 
