@@ -80,12 +80,11 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="${{ github.event.release.tag_name }}"
-          URL="https://pkg.go.dev/fetch/${MODULE}@${VERSION}"
+          URL="https://pkg.go.dev/${MODULE}@${VERSION}"
           for i in 1 2 3 4 5; do
             if curl -fsSL "$URL" >/dev/null; then
               exit 0
             fi
             sleep $((i * 2))
           done
-          echo "failed to trigger pkg.go.dev refresh after retries"
-          exit 1
+          echo "::warning::pkg.go.dev did not return success after retries; indexing may still be in progress"
